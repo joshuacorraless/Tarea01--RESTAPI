@@ -1,0 +1,365 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Restaurant Reservations API",
+    "version": "1.0.0",
+    "description": "rest api para gestion de reservas en restaurantes - autenticacion via keycloak"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "local development"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "access token emitido por keycloak"
+      }
+    },
+    "schemas": {
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "message": { "type": "string" },
+          "data": {}
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": ["fullName", "email", "password"],
+        "properties": {
+          "fullName": { "type": "string", "minLength": 2, "maxLength": 100, "example": "Juan Perez" },
+          "email": { "type": "string", "format": "email", "example": "juan@example.com" },
+          "password": { "type": "string", "minLength": 8, "example": "password123" },
+          "phone": { "type": "string", "example": "+506 8888-8888" },
+          "role": { "type": "string", "enum": ["client", "restaurant_admin"], "default": "client" }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email", "example": "juan@example.com" },
+          "password": { "type": "string", "example": "password123" }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": { "type": "string" },
+          "refreshToken": { "type": "string" },
+          "expiresIn": { "type": "integer" },
+          "tokenType": { "type": "string" }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "fullName": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "role": { "type": "string", "enum": ["client", "restaurant_admin"] },
+          "phone": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "fullName": { "type": "string", "minLength": 2, "maxLength": 100, "example": "Juan Perez Updated" },
+          "phone": { "type": "string", "example": "+506 9999-9999" }
+        }
+      },
+      "CreateRestaurantRequest": {
+        "type": "object",
+        "required": ["name", "address"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 200, "example": "La Casona" },
+          "description": { "type": "string", "maxLength": 1000, "example": "Restaurante de comida tipica costarricense" },
+          "address": { "type": "string", "minLength": 1, "maxLength": 500, "example": "San Jose, Costa Rica" },
+          "phone": { "type": "string", "example": "+506 2222-2222" },
+          "openingHours": { "type": "string", "maxLength": 200, "example": "Lun-Vie 8:00-22:00" }
+        }
+      },
+      "Restaurant": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "address": { "type": "string" },
+          "phone": { "type": "string" },
+          "openingHours": { "type": "string" },
+          "adminUserId": { "type": "string", "format": "uuid" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "adminUser": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "format": "uuid" },
+              "fullName": { "type": "string" },
+              "email": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "registrar un usuario nuevo",
+        "description": "crea el usuario en keycloak, le asigna el rol y crea el registro local en postgresql",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RegisterRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "usuario registrado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponse" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": { "$ref": "#/components/schemas/User" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "description": "datos de entrada invalidos" },
+          "409": { "description": "el usuario ya existe en keycloak" },
+          "500": { "description": "error interno del servidor" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "iniciar sesion",
+        "description": "autentica al usuario via keycloak y devuelve access token + refresh token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "login exitoso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponse" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": { "$ref": "#/components/schemas/LoginResponse" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "description": "datos de entrada invalidos" },
+          "401": { "description": "credenciales invalidas" },
+          "500": { "description": "error interno del servidor" }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "obtener perfil del usuario autenticado",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "perfil del usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponse" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": { "$ref": "#/components/schemas/User" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "description": "no autenticado" },
+          "404": { "description": "usuario no encontrado" }
+        }
+      }
+    },
+    "/users/{id}": {
+      "put": {
+        "tags": ["Users"],
+        "summary": "actualizar perfil propio",
+        "description": "solo permite modificar el perfil del usuario autenticado",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "description": "id del usuario (debe ser el propio)"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateUserRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "usuario actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponse" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": { "$ref": "#/components/schemas/User" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "description": "no autenticado" },
+          "403": { "description": "no puedes modificar el perfil de otro usuario" },
+          "404": { "description": "usuario no encontrado" }
+        }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "eliminar cuenta propia (soft delete)",
+        "description": "solo permite eliminar la cuenta del usuario autenticado",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "description": "id del usuario (debe ser el propio)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "usuario eliminado (soft delete)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResponse" }
+              }
+            }
+          },
+          "401": { "description": "no autenticado" },
+          "403": { "description": "no puedes eliminar la cuenta de otro usuario" },
+          "404": { "description": "usuario no encontrado" }
+        }
+      }
+    },
+    "/restaurants": {
+      "get": {
+        "tags": ["Restaurants"],
+        "summary": "listar todos los restaurantes",
+        "description": "endpoint publico - devuelve todos los restaurantes activos",
+        "responses": {
+          "200": {
+            "description": "lista de restaurantes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponse" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/Restaurant" }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": { "description": "error interno del servidor" }
+        }
+      },
+      "post": {
+        "tags": ["Restaurants"],
+        "summary": "crear un restaurante",
+        "description": "solo restaurant_admin puede crear restaurantes. el restaurante se vincula al admin autenticado",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateRestaurantRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "restaurante creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponse" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": { "$ref": "#/components/schemas/Restaurant" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "description": "datos de entrada invalidos" },
+          "401": { "description": "no autenticado" },
+          "403": { "description": "no tienes permisos de restaurant_admin" },
+          "500": { "description": "error interno del servidor" }
+        }
+      }
+    }
+  }
+}

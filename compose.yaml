@@ -1,0 +1,75 @@
+services:
+  # =============================================
+  # postgresql - base de datos
+  # =============================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: restaurant-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5433:5432"
+    volumes:
+      # los archivos en /docker-entrypoint-initdb.d se ejecutan automaticamente
+      # al crear la base de datos por primera vez (en orden alfabetico)
+      - ./database/00-create-databases.sql:/docker-entrypoint-initdb.d/00-create-databases.sql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./database/stored-procedures.sql:/docker-entrypoint-initdb.d/02-stored-procedures.sql
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # =============================================
+  # keycloak - servicio de autenticacion
+  # =============================================
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: restaurant-keycloak
+    command: start-dev
+    environment:
+      # credenciales del admin console de keycloak
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_ADMIN_USERNAME}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
+      # base de datos de keycloak (usa el mismo postgres)
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak_db
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # =============================================
+  # api - nuestra rest api
+  # =============================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: restaurant-api
+    environment:
+      PORT: ${PORT}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      KEYCLOAK_BASE_URL: http://keycloak:8080
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+      KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID}
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+
+volumes:
+  postgres_data:
