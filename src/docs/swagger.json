@@ -24,87 +24,642 @@
       "ApiResponse": {
         "type": "object",
         "properties": {
-          "success": { "type": "boolean" },
-          "message": { "type": "string" },
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
           "data": {}
         }
       },
       "RegisterRequest": {
         "type": "object",
-        "required": ["fullName", "email", "password"],
+        "required": [
+          "fullName",
+          "email",
+          "password"
+        ],
         "properties": {
-          "fullName": { "type": "string", "minLength": 2, "maxLength": 100, "example": "Juan Perez" },
-          "email": { "type": "string", "format": "email", "example": "juan@example.com" },
-          "password": { "type": "string", "minLength": 8, "example": "password123" },
-          "phone": { "type": "string", "example": "+506 8888-8888" },
-          "role": { "type": "string", "enum": ["client", "restaurant_admin"], "default": "client" }
+          "fullName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100,
+            "example": "Juan Perez"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "juan@example.com"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "example": "password123"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+506 8888-8888"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "client",
+              "restaurant_admin"
+            ],
+            "default": "client"
+          }
         }
       },
       "LoginRequest": {
         "type": "object",
-        "required": ["email", "password"],
+        "required": [
+          "email",
+          "password"
+        ],
         "properties": {
-          "email": { "type": "string", "format": "email", "example": "juan@example.com" },
-          "password": { "type": "string", "example": "password123" }
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "juan@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123"
+          }
         }
       },
       "LoginResponse": {
         "type": "object",
         "properties": {
-          "accessToken": { "type": "string" },
-          "refreshToken": { "type": "string" },
-          "expiresIn": { "type": "integer" },
-          "tokenType": { "type": "string" }
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "expiresIn": {
+            "type": "integer"
+          },
+          "tokenType": {
+            "type": "string"
+          }
         }
       },
       "User": {
         "type": "object",
         "properties": {
-          "id": { "type": "string", "format": "uuid" },
-          "fullName": { "type": "string" },
-          "email": { "type": "string", "format": "email" },
-          "role": { "type": "string", "enum": ["client", "restaurant_admin"] },
-          "phone": { "type": "string" },
-          "createdAt": { "type": "string", "format": "date-time" },
-          "updatedAt": { "type": "string", "format": "date-time" }
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "client",
+              "restaurant_admin"
+            ]
+          },
+          "phone": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
       "UpdateUserRequest": {
         "type": "object",
         "properties": {
-          "fullName": { "type": "string", "minLength": 2, "maxLength": 100, "example": "Juan Perez Updated" },
-          "phone": { "type": "string", "example": "+506 9999-9999" }
+          "fullName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100,
+            "example": "Juan Perez Updated"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+506 9999-9999"
+          }
         }
       },
       "CreateRestaurantRequest": {
         "type": "object",
-        "required": ["name", "address"],
+        "required": [
+          "name",
+          "address"
+        ],
         "properties": {
-          "name": { "type": "string", "minLength": 1, "maxLength": 200, "example": "La Casona" },
-          "description": { "type": "string", "maxLength": 1000, "example": "Restaurante de comida tipica costarricense" },
-          "address": { "type": "string", "minLength": 1, "maxLength": 500, "example": "San Jose, Costa Rica" },
-          "phone": { "type": "string", "example": "+506 2222-2222" },
-          "openingHours": { "type": "string", "maxLength": 200, "example": "Lun-Vie 8:00-22:00" }
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "example": "La Casona"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "example": "Restaurante de comida tipica costarricense"
+          },
+          "address": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500,
+            "example": "San Jose, Costa Rica"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+506 2222-2222"
+          },
+          "openingHours": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "Lun-Vie 8:00-22:00"
+          }
         }
       },
       "Restaurant": {
         "type": "object",
         "properties": {
-          "id": { "type": "string", "format": "uuid" },
-          "name": { "type": "string" },
-          "description": { "type": "string" },
-          "address": { "type": "string" },
-          "phone": { "type": "string" },
-          "openingHours": { "type": "string" },
-          "adminUserId": { "type": "string", "format": "uuid" },
-          "createdAt": { "type": "string", "format": "date-time" },
-          "updatedAt": { "type": "string", "format": "date-time" },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "openingHours": {
+            "type": "string"
+          },
+          "adminUserId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
           "adminUser": {
             "type": "object",
             "properties": {
-              "id": { "type": "string", "format": "uuid" },
-              "fullName": { "type": "string" },
-              "email": { "type": "string" }
+              "fullName": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "CreateMenuRequest": {
+        "type": "object",
+        "required": [
+          "idRestaurante",
+          "nombre",
+          "detalles"
+        ],
+        "properties": {
+          "idRestaurante": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "nombre": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "example": "Menu del Dia"
+          },
+          "detalles": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "example": "Seleccion de platos frescos del dia"
+          },
+          "activo": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "UpdateMenuRequest": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "detalles": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "activo": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Menu": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "idRestaurante": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "detalles": {
+            "type": "string"
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "creadoEn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ultimaActualizacion": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateMenuItemRequest": {
+        "type": "object",
+        "required": [
+          "nombre",
+          "detalles",
+          "precio"
+        ],
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "example": "Gallo Pinto"
+          },
+          "detalles": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "example": "Arroz con frijoles, huevo y natilla"
+          },
+          "precio": {
+            "type": "number",
+            "minimum": 0,
+            "example": 3500
+          },
+          "imagen": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://example.com/gallo-pinto.jpg"
+          },
+          "disponible": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "UpdateMenuItemRequest": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "detalles": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "precio": {
+            "type": "number",
+            "minimum": 0
+          },
+          "imagen": {
+            "type": "string",
+            "format": "uri"
+          },
+          "disponible": {
+            "type": "boolean"
+          }
+        }
+      },
+      "MenuItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "idMenu": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "detalles": {
+            "type": "string"
+          },
+          "precio": {
+            "type": "number"
+          },
+          "imagen": {
+            "type": "string"
+          },
+          "disponible": {
+            "type": "boolean"
+          },
+          "creadoEn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ultimaActualizacion": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Table": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "idRestaurante": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "numeroMesa": {
+            "type": "string"
+          },
+          "capacidad": {
+            "type": "integer"
+          },
+          "disponible": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateReservationRequest": {
+        "type": "object",
+        "required": [
+          "idRestaurante",
+          "mesaId",
+          "tamannoReserva",
+          "reservadoPara"
+        ],
+        "properties": {
+          "idRestaurante": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "mesaId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tamannoReserva": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 4
+          },
+          "reservadoPara": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-12-01T19:00:00.000Z"
+          },
+          "duracionReserva": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 90
+          },
+          "notas": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "Mesa cerca de la ventana"
+          }
+        }
+      },
+      "Reservation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "idRestaurante": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "mesaId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "idClienteUsuario": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tamannoReserva": {
+            "type": "integer"
+          },
+          "reservadoPara": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "duracionReserva": {
+            "type": "integer"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "pendiente",
+              "confirmada",
+              "cancelada",
+              "completada"
+            ]
+          },
+          "notas": {
+            "type": "string"
+          },
+          "creadoEn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ultimaActualizacion": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "OrderItem": {
+        "type": "object",
+        "required": [
+          "idItemMenu",
+          "cantidad"
+        ],
+        "properties": {
+          "idItemMenu": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "cantidad": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 2
+          },
+          "notas": {
+            "type": "string",
+            "maxLength": 300,
+            "example": "Bien cocido"
+          }
+        }
+      },
+      "CreateOrderRequest": {
+        "type": "object",
+        "required": [
+          "idRestaurante",
+          "items"
+        ],
+        "properties": {
+          "idRestaurante": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "idReserva": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tipoOrden": {
+            "type": "string",
+            "enum": [
+              "en-restaurante",
+              "para-llevar"
+            ],
+            "default": "en-restaurante"
+          },
+          "notas": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "Sin picante"
+          },
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/OrderItem"
+            }
+          }
+        }
+      },
+      "UpdateOrderStatusRequest": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pendiente",
+              "confirmada",
+              "en-preparacion",
+              "lista",
+              "entregada",
+              "cancelada"
+            ]
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "idRestaurante": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "idClienteUsuario": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "idReserva": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tipoOrden": {
+            "type": "string",
+            "enum": [
+              "en-restaurante",
+              "para-llevar"
+            ]
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "pendiente",
+              "confirmada",
+              "en-preparacion",
+              "lista",
+              "entregada",
+              "cancelada"
+            ]
+          },
+          "total": {
+            "type": "number"
+          },
+          "notas": {
+            "type": "string"
+          },
+          "creadoEn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ultimaActualizacion": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object"
             }
           }
         }
@@ -114,14 +669,17 @@
   "paths": {
     "/auth/register": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "registrar un usuario nuevo",
-        "description": "crea el usuario en keycloak, le asigna el rol y crea el registro local en postgresql",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/RegisterRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
             }
           }
         },
@@ -132,11 +690,15 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/ApiResponse" },
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
                     {
                       "type": "object",
                       "properties": {
-                        "data": { "$ref": "#/components/schemas/User" }
+                        "data": {
+                          "$ref": "#/components/schemas/User"
+                        }
                       }
                     }
                   ]
@@ -144,22 +706,31 @@
               }
             }
           },
-          "400": { "description": "datos de entrada invalidos" },
-          "409": { "description": "el usuario ya existe en keycloak" },
-          "500": { "description": "error interno del servidor" }
+          "400": {
+            "description": "datos de entrada invalidos"
+          },
+          "409": {
+            "description": "el usuario ya existe"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
         }
       }
     },
     "/auth/login": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "iniciar sesion",
-        "description": "autentica al usuario via keycloak y devuelve access token + refresh token",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/LoginRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
             }
           }
         },
@@ -170,147 +741,14 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/ApiResponse" },
                     {
-                      "type": "object",
-                      "properties": {
-                        "data": { "$ref": "#/components/schemas/LoginResponse" }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": { "description": "datos de entrada invalidos" },
-          "401": { "description": "credenciales invalidas" },
-          "500": { "description": "error interno del servidor" }
-        }
-      }
-    },
-    "/users/me": {
-      "get": {
-        "tags": ["Users"],
-        "summary": "obtener perfil del usuario autenticado",
-        "security": [{ "bearerAuth": [] }],
-        "responses": {
-          "200": {
-            "description": "perfil del usuario",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    { "$ref": "#/components/schemas/ApiResponse" },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": { "$ref": "#/components/schemas/User" }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": { "description": "no autenticado" },
-          "404": { "description": "usuario no encontrado" }
-        }
-      }
-    },
-    "/users/{id}": {
-      "put": {
-        "tags": ["Users"],
-        "summary": "actualizar perfil propio",
-        "description": "solo permite modificar el perfil del usuario autenticado",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": { "type": "string", "format": "uuid" },
-            "description": "id del usuario (debe ser el propio)"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UpdateUserRequest" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "usuario actualizado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    { "$ref": "#/components/schemas/ApiResponse" },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": { "$ref": "#/components/schemas/User" }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": { "description": "no autenticado" },
-          "403": { "description": "no puedes modificar el perfil de otro usuario" },
-          "404": { "description": "usuario no encontrado" }
-        }
-      },
-      "delete": {
-        "tags": ["Users"],
-        "summary": "eliminar cuenta propia (soft delete)",
-        "description": "solo permite eliminar la cuenta del usuario autenticado",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": { "type": "string", "format": "uuid" },
-            "description": "id del usuario (debe ser el propio)"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "usuario eliminado (soft delete)",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ApiResponse" }
-              }
-            }
-          },
-          "401": { "description": "no autenticado" },
-          "403": { "description": "no puedes eliminar la cuenta de otro usuario" },
-          "404": { "description": "usuario no encontrado" }
-        }
-      }
-    },
-    "/restaurants": {
-      "get": {
-        "tags": ["Restaurants"],
-        "summary": "listar todos los restaurantes",
-        "description": "endpoint publico - devuelve todos los restaurantes activos",
-        "responses": {
-          "200": {
-            "description": "lista de restaurantes",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    { "$ref": "#/components/schemas/ApiResponse" },
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
                     {
                       "type": "object",
                       "properties": {
                         "data": {
-                          "type": "array",
-                          "items": { "$ref": "#/components/schemas/Restaurant" }
+                          "$ref": "#/components/schemas/LoginResponse"
                         }
                       }
                     }
@@ -319,34 +757,42 @@
               }
             }
           },
-          "500": { "description": "error interno del servidor" }
-        }
-      },
-      "post": {
-        "tags": ["Restaurants"],
-        "summary": "crear un restaurante",
-        "description": "solo restaurant_admin puede crear restaurantes. el restaurante se vincula al admin autenticado",
-        "security": [{ "bearerAuth": [] }],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/CreateRestaurantRequest" }
-            }
+          "401": {
+            "description": "credenciales invalidas"
+          },
+          "500": {
+            "description": "error interno del servidor"
           }
-        },
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "obtener perfil del usuario autenticado",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "201": {
-            "description": "restaurante creado exitosamente",
+          "200": {
+            "description": "perfil del usuario",
             "content": {
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/ApiResponse" },
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
                     {
                       "type": "object",
                       "properties": {
-                        "data": { "$ref": "#/components/schemas/Restaurant" }
+                        "data": {
+                          "$ref": "#/components/schemas/User"
+                        }
                       }
                     }
                   ]
@@ -354,10 +800,1349 @@
               }
             }
           },
-          "400": { "description": "datos de entrada invalidos" },
-          "401": { "description": "no autenticado" },
-          "403": { "description": "no tienes permisos de restaurant_admin" },
-          "500": { "description": "error interno del servidor" }
+          "401": {
+            "description": "no autenticado"
+          },
+          "404": {
+            "description": "usuario no encontrado"
+          }
+        }
+      }
+    },
+    "/users/me/reservations": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "obtener reservas del usuario autenticado",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "lista de reservas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Reservation"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "no autenticado"
+          }
+        }
+      }
+    },
+    "/users/me/orders": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "obtener pedidos del usuario autenticado",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "lista de pedidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Order"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "no autenticado"
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "actualizar perfil propio",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "usuario actualizado"
+          },
+          "403": {
+            "description": "no puedes modificar el perfil de otro usuario"
+          },
+          "404": {
+            "description": "usuario no encontrado"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "eliminar cuenta propia (soft delete)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "usuario eliminado"
+          },
+          "403": {
+            "description": "no puedes eliminar la cuenta de otro usuario"
+          },
+          "404": {
+            "description": "usuario no encontrado"
+          }
+        }
+      }
+    },
+    "/restaurants": {
+      "get": {
+        "tags": [
+          "Restaurants"
+        ],
+        "summary": "listar todos los restaurantes (publico)",
+        "responses": {
+          "200": {
+            "description": "lista de restaurantes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Restaurant"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Restaurants"
+        ],
+        "summary": "crear un restaurante (solo restaurant_admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRestaurantRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "restaurante creado"
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "403": {
+            "description": "no tienes permisos de restaurant_admin"
+          }
+        }
+      }
+    },
+    "/menus": {
+      "post": {
+        "tags": [
+          "Menus"
+        ],
+        "summary": "crear un menu (solo restaurant_admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMenuRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "menu creado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Menu"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "datos invalidos"
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "403": {
+            "description": "sin permisos"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      }
+    },
+    "/menus/{id}": {
+      "get": {
+        "tags": [
+          "Menus"
+        ],
+        "summary": "obtener menu por ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "menu encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Menu"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "menu no encontrado"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Menus"
+        ],
+        "summary": "actualizar menu (solo restaurant_admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMenuRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "menu actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Menu"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "403": {
+            "description": "sin permisos"
+          },
+          "404": {
+            "description": "menu no encontrado"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Menus"
+        ],
+        "summary": "eliminar menu (soft delete, solo restaurant_admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "menu eliminado"
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "403": {
+            "description": "sin permisos"
+          },
+          "404": {
+            "description": "menu no encontrado"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      }
+    },
+    "/menus/restaurant/{restaurantId}": {
+      "get": {
+        "tags": [
+          "Menus"
+        ],
+        "summary": "listar menus de un restaurante",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "restaurantId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "lista de menus",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Menu"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      }
+    },
+    "/menus/{menuId}/items": {
+      "get": {
+        "tags": [
+          "Menus"
+        ],
+        "summary": "listar items de un menu",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "menuId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "lista de items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/MenuItem"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Menus"
+        ],
+        "summary": "agregar item al menu (solo restaurant_admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "menuId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMenuItemRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "item creado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/MenuItem"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "datos invalidos"
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "403": {
+            "description": "sin permisos"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      }
+    },
+    "/menus/{menuId}/items/{itemId}": {
+      "put": {
+        "tags": [
+          "Menus"
+        ],
+        "summary": "actualizar item del menu (solo restaurant_admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "menuId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "itemId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMenuItemRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "item actualizado"
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "403": {
+            "description": "sin permisos"
+          },
+          "404": {
+            "description": "item no encontrado"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Menus"
+        ],
+        "summary": "eliminar item del menu (soft delete, solo restaurant_admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "menuId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "itemId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "item eliminado"
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "403": {
+            "description": "sin permisos"
+          },
+          "404": {
+            "description": "item no encontrado"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      }
+    },
+    "/reservations/available-tables": {
+      "get": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "consultar mesas disponibles (publico)",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "restaurantId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "reservadoPara",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "example": "2025-12-01T19:00:00.000Z"
+          },
+          {
+            "in": "query",
+            "name": "duracion",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 90
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "mesas disponibles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Table"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "parametros requeridos faltantes"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      }
+    },
+    "/reservations": {
+      "post": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "crear una reserva (solo client)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReservationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "reserva creada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Reservation"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "datos invalidos"
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "403": {
+            "description": "sin permisos"
+          },
+          "409": {
+            "description": "mesa no disponible para ese horario"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      }
+    },
+    "/reservations/me": {
+      "get": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "mis reservas (cliente autenticado)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "lista de mis reservas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Reservation"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      }
+    },
+    "/reservations/restaurant/{restaurantId}": {
+      "get": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "reservas de un restaurante (solo restaurant_admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "restaurantId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "lista de reservas del restaurante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Reservation"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "403": {
+            "description": "sin permisos"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      }
+    },
+    "/reservations/{id}": {
+      "get": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "obtener reserva por ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "detalle de la reserva",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Reservation"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "404": {
+            "description": "reserva no encontrada"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "cancelar reserva (solo client dueno de la reserva)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "reserva cancelada"
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "403": {
+            "description": "sin permisos"
+          },
+          "404": {
+            "description": "reserva no encontrada o ya cancelada"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      }
+    },
+    "/orders": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "crear un pedido (solo client)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "pedido creado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Order"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "datos invalidos"
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "403": {
+            "description": "sin permisos"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      }
+    },
+    "/orders/me": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "mis pedidos (cliente autenticado)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "lista de mis pedidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Order"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "obtener pedido por ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "detalle del pedido con items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Order"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "404": {
+            "description": "pedido no encontrado"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      }
+    },
+    "/orders/{id}/items": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "agregar item a un pedido pendiente (solo client)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderItem"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "item agregado"
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "403": {
+            "description": "sin permisos"
+          },
+          "404": {
+            "description": "pedido no encontrado"
+          },
+          "409": {
+            "description": "el pedido no esta en estado pendiente"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
+        }
+      }
+    },
+    "/orders/{id}/status": {
+      "patch": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "actualizar estado del pedido (solo restaurant_admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "estado actualizado"
+          },
+          "400": {
+            "description": "estado invalido"
+          },
+          "401": {
+            "description": "no autenticado"
+          },
+          "403": {
+            "description": "sin permisos"
+          },
+          "404": {
+            "description": "pedido no encontrado"
+          },
+          "500": {
+            "description": "error interno del servidor"
+          }
         }
       }
     }
