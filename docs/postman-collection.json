@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Restaurant API",
-    "_postman_id": "restaurant-api-collection",
+    "_postman_id": "f3a2b1c0-d4e5-4f67-89ab-cdef01234567",
     "description": "coleccion de postman para la rest api de restaurantes con keycloak",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -44,9 +44,11 @@
   ],
   "item": [
     {
+      "id": "11111111-1111-1111-1111-111111111101",
       "name": "Auth",
       "item": [
         {
+          "id": "22222222-2222-2222-2222-222222222201",
           "name": "Register - Client",
           "request": {
             "method": "POST",
@@ -66,9 +68,11 @@
               }
             },
             "url": "{{baseUrl}}/auth/register"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222202",
           "name": "Register - Restaurant Admin",
           "request": {
             "method": "POST",
@@ -88,9 +92,11 @@
               }
             },
             "url": "{{baseUrl}}/auth/register"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222203",
           "name": "Login",
           "event": [
             {
@@ -124,14 +130,17 @@
               }
             },
             "url": "{{baseUrl}}/auth/login"
-          }
+          },
+          "response": []
         }
       ]
     },
     {
+      "id": "11111111-1111-1111-1111-111111111102",
       "name": "Users",
       "item": [
         {
+          "id": "22222222-2222-2222-2222-222222222204",
           "name": "Get My Profile",
           "request": {
             "method": "GET",
@@ -142,9 +151,11 @@
               }
             ],
             "url": "{{baseUrl}}/users/me"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222205",
           "name": "Get My Reservations",
           "request": {
             "method": "GET",
@@ -155,9 +166,11 @@
               }
             ],
             "url": "{{baseUrl}}/users/me/reservations"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222206",
           "name": "Get My Orders",
           "request": {
             "method": "GET",
@@ -168,9 +181,11 @@
               }
             ],
             "url": "{{baseUrl}}/users/me/orders"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222207",
           "name": "Update My Profile",
           "request": {
             "method": "PUT",
@@ -194,9 +209,11 @@
               }
             },
             "url": "{{baseUrl}}/users/:id"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222208",
           "name": "Delete My Account",
           "request": {
             "method": "DELETE",
@@ -207,22 +224,27 @@
               }
             ],
             "url": "{{baseUrl}}/users/:id"
-          }
+          },
+          "response": []
         }
       ]
     },
     {
+      "id": "11111111-1111-1111-1111-111111111103",
       "name": "Restaurants",
       "item": [
         {
+          "id": "22222222-2222-2222-2222-222222222209",
           "name": "List Restaurants (Public)",
           "request": {
             "method": "GET",
             "header": [],
             "url": "{{baseUrl}}/restaurants"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222210",
           "name": "Create Restaurant (Admin Only)",
           "event": [
             {
@@ -260,14 +282,17 @@
               }
             },
             "url": "{{baseUrl}}/restaurants"
-          }
+          },
+          "response": []
         }
       ]
     },
     {
+      "id": "11111111-1111-1111-1111-111111111104",
       "name": "Menus",
       "item": [
         {
+          "id": "22222222-2222-2222-2222-222222222211",
           "name": "Create Menu (Admin Only)",
           "event": [
             {
@@ -305,9 +330,11 @@
               }
             },
             "url": "{{baseUrl}}/menus"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222212",
           "name": "Get Menu by ID",
           "request": {
             "method": "GET",
@@ -318,9 +345,11 @@
               }
             ],
             "url": "{{baseUrl}}/menus/{{menuId}}"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222213",
           "name": "Get Menus by Restaurant",
           "request": {
             "method": "GET",
@@ -331,9 +360,11 @@
               }
             ],
             "url": "{{baseUrl}}/menus/restaurant/{{restaurantId}}"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222214",
           "name": "Update Menu (Admin Only)",
           "request": {
             "method": "PUT",
@@ -357,9 +388,11 @@
               }
             },
             "url": "{{baseUrl}}/menus/{{menuId}}"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222215",
           "name": "Delete Menu (Admin Only)",
           "request": {
             "method": "DELETE",
@@ -370,9 +403,11 @@
               }
             ],
             "url": "{{baseUrl}}/menus/{{menuId}}"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222216",
           "name": "Create Menu Item (Admin Only)",
           "event": [
             {
@@ -410,9 +445,11 @@
               }
             },
             "url": "{{baseUrl}}/menus/{{menuId}}/items"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222217",
           "name": "Get Menu Items",
           "request": {
             "method": "GET",
@@ -423,9 +460,11 @@
               }
             ],
             "url": "{{baseUrl}}/menus/{{menuId}}/items"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222218",
           "name": "Update Menu Item (Admin Only)",
           "request": {
             "method": "PUT",
@@ -449,9 +488,11 @@
               }
             },
             "url": "{{baseUrl}}/menus/{{menuId}}/items/{{menuItemId}}"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222219",
           "name": "Delete Menu Item (Admin Only)",
           "request": {
             "method": "DELETE",
@@ -462,14 +503,17 @@
               }
             ],
             "url": "{{baseUrl}}/menus/{{menuId}}/items/{{menuItemId}}"
-          }
+          },
+          "response": []
         }
       ]
     },
     {
+      "id": "11111111-1111-1111-1111-111111111105",
       "name": "Reservations",
       "item": [
         {
+          "id": "22222222-2222-2222-2222-222222222220",
           "name": "Get Available Tables",
           "request": {
             "method": "GET",
@@ -498,9 +542,11 @@
                 }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222221",
           "name": "Create Reservation (Client Only)",
           "event": [
             {
@@ -538,9 +584,11 @@
               }
             },
             "url": "{{baseUrl}}/reservations"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222222",
           "name": "Get Reservation by ID",
           "request": {
             "method": "GET",
@@ -551,9 +599,11 @@
               }
             ],
             "url": "{{baseUrl}}/reservations/{{reservationId}}"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222223",
           "name": "Get My Reservations",
           "request": {
             "method": "GET",
@@ -564,9 +614,11 @@
               }
             ],
             "url": "{{baseUrl}}/reservations/me"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222224",
           "name": "Get Reservations by Restaurant (Admin Only)",
           "request": {
             "method": "GET",
@@ -577,9 +629,11 @@
               }
             ],
             "url": "{{baseUrl}}/reservations/restaurant/{{restaurantId}}"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222225",
           "name": "Cancel Reservation (Client Only)",
           "request": {
             "method": "DELETE",
@@ -590,14 +644,17 @@
               }
             ],
             "url": "{{baseUrl}}/reservations/{{reservationId}}"
-          }
+          },
+          "response": []
         }
       ]
     },
     {
+      "id": "11111111-1111-1111-1111-111111111106",
       "name": "Orders",
       "item": [
         {
+          "id": "22222222-2222-2222-2222-222222222226",
           "name": "Create Order (Client Only)",
           "event": [
             {
@@ -635,9 +692,11 @@
               }
             },
             "url": "{{baseUrl}}/orders"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222227",
           "name": "Get Order by ID",
           "request": {
             "method": "GET",
@@ -648,9 +707,11 @@
               }
             ],
             "url": "{{baseUrl}}/orders/{{orderId}}"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222228",
           "name": "Get My Orders",
           "request": {
             "method": "GET",
@@ -661,9 +722,11 @@
               }
             ],
             "url": "{{baseUrl}}/orders/me"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222229",
           "name": "Add Item to Order (Client Only)",
           "request": {
             "method": "POST",
@@ -687,9 +750,11 @@
               }
             },
             "url": "{{baseUrl}}/orders/{{orderId}}/items"
-          }
+          },
+          "response": []
         },
         {
+          "id": "22222222-2222-2222-2222-222222222230",
           "name": "Update Order Status (Admin Only)",
           "request": {
             "method": "PATCH",
@@ -713,7 +778,8 @@
               }
             },
             "url": "{{baseUrl}}/orders/{{orderId}}/status"
-          }
+          },
+          "response": []
         }
       ]
     }
