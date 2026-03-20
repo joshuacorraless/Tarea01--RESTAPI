@@ -1,4 +1,4 @@
-# Reserva Inteligente de Restaurantes — Tarea 01 REST API
+# Reserva de Restaurantes — Tarea 01 REST API
 
 Para el curso de Bases de Datos 2, desarollamos una API REST para la gestión de restaurantes, reservas, menús y pedidos. Construida con Node.js, TypeScript, PostgreSQL y Keycloak como servicio de autenticación.
 
