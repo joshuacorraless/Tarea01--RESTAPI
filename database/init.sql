@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS itemsDelMenu (
   idMenu     UUID            NOT NULL REFERENCES menus(id),
   nombre        VARCHAR(200)    NOT NULL,
   detalles   VARCHAR(1000)   NOT NULL,
+  categoria    VARCHAR(100)    NOT NULL DEFAULT 'General',
   precio       NUMERIC(10, 2)  NOT NULL CHECK (precio >= 0),
   imagen   VARCHAR(500) NULL,
   disponible BOOLEAN        NOT NULL DEFAULT TRUE,
@@ -152,6 +153,9 @@ CREATE INDEX IF NOT EXISTS idx_menus_idRestaurante ON menus(idRestaurante);
 
 -- para buscar items de menu por menu
 CREATE INDEX IF NOT EXISTS idx_itemsDelMenu_idMenu ON itemsDelMenu(idMenu);
+
+-- para buscar items por categoria (requerido por el microservicio de busqueda)
+CREATE INDEX IF NOT EXISTS idx_itemsDelMenu_categoria ON itemsDelMenu(categoria);
 
 -- para buscar mesas por restaurante
 CREATE INDEX IF NOT EXISTS idx_mesas_idRestaurante ON mesas(idRestaurante);

@@ -13,6 +13,7 @@ const envSchema = z.object({
   KEYCLOAK_CLIENT_SECRET: z.string().min(1),
   KEYCLOAK_ADMIN_CLIENT_ID: z.string().min(1),
   KEYCLOAK_ADMIN_CLIENT_SECRET: z.string().min(1),
+  DB_ENGINE: z.enum(['postgres', 'mongo']).default('postgres'),
 });
 
 const parsed = envSchema.safeParse(process.env);

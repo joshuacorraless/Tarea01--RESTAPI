@@ -11,6 +11,7 @@ jest.mock("../config/env", () => ({
     KEYCLOAK_CLIENT_SECRET: "test-secret",
     KEYCLOAK_ADMIN_CLIENT_ID: "admin-cli",
     KEYCLOAK_ADMIN_CLIENT_SECRET: "admin-secret",
+    DB_ENGINE: "postgres",
   },
 }));
 

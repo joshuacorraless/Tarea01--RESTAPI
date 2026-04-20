@@ -158,14 +158,15 @@ describe("createMenuItemService", () => {
     const result = await createMenuItemService("1", {
       nombre: "Gallo Pinto",
       detalles: "con natilla",
+      categoria: "General",
       precio: 2500,
       disponible: true,
     });
 
     expect(result).toEqual(mappedItem);
     expect(mockedPool.query).toHaveBeenCalledWith(
-      "SELECT * FROM sp_create_menu_item($1, $2, $3, $4, $5, $6)",
-      ["1", "Gallo Pinto", "con natilla", 2500, null, true],
+      "SELECT * FROM sp_create_menu_item($1, $2, $3, $4, $5, $6, $7)",
+      ["1", "Gallo Pinto", "con natilla", 2500, null, true, "General"],
     );
   });
 
@@ -174,6 +175,7 @@ describe("createMenuItemService", () => {
     await createMenuItemService("1", {
       nombre: "X",
       detalles: "Y",
+      categoria: "General",
       precio: 100,
       disponible: true,
     });

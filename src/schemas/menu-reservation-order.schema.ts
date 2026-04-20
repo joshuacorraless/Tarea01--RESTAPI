@@ -21,6 +21,7 @@ export type UpdateMenuInput = z.infer<typeof updateMenuSchema>;
 export const createMenuItemSchema = z.object({
   nombre: z.string().min(1).max(200),
   detalles: z.string().min(1).max(1000),
+  categoria: z.string().min(1).max(100).default('General'),
   precio: z.number().nonnegative(),
   imagen: z.string().url().max(500).optional(),
   disponible: z.boolean().optional().default(true),
@@ -29,6 +30,7 @@ export const createMenuItemSchema = z.object({
 export const updateMenuItemSchema = z.object({
   nombre: z.string().min(1).max(200).optional(),
   detalles: z.string().min(1).max(1000).optional(),
+  categoria: z.string().min(1).max(100).optional(),
   precio: z.number().nonnegative().optional(),
   imagen: z.string().url().max(500).optional(),
   disponible: z.boolean().optional(),

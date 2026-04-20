@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>23/23</span>
+                <span class='fraction'>21/21</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>14/14</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>23/23</span>
+                <span class='fraction'>21/21</span>
             </div>
         
             
@@ -126,36 +126,18 @@
 <a name='L61'></a><a href='#L61'>61</a>
 <a name='L62'></a><a href='#L62'>62</a>
 <a name='L63'></a><a href='#L63'>63</a>
-<a name='L64'></a><a href='#L64'>64</a>
-<a name='L65'></a><a href='#L65'>65</a>
-<a name='L66'></a><a href='#L66'>66</a>
-<a name='L67'></a><a href='#L67'>67</a>
-<a name='L68'></a><a href='#L68'>68</a>
-<a name='L69'></a><a href='#L69'>69</a>
-<a name='L70'></a><a href='#L70'>70</a>
-<a name='L71'></a><a href='#L71'>71</a>
-<a name='L72'></a><a href='#L72'>72</a>
-<a name='L73'></a><a href='#L73'>73</a>
-<a name='L74'></a><a href='#L74'>74</a>
-<a name='L75'></a><a href='#L75'>75</a>
-<a name='L76'></a><a href='#L76'>76</a>
-<a name='L77'></a><a href='#L77'>77</a>
-<a name='L78'></a><a href='#L78'>78</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+<a name='L64'></a><a href='#L64'>64</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -168,11 +150,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -187,8 +165,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -203,12 +179,8 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
@@ -217,82 +189,68 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import pool from '../config/database';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { dao } from '../dao/DaoFactory';
 import { UpdateUserInput } from '../schemas/user.schema';
 &nbsp;
 // obtiene el usuario local por su external_auth_id (sub del jwt de keycloak)
 export async function getUserByExternalId(externalAuthId: string) {
-  const result = await pool.query(
-    'SELECT * FROM sp_get_user_by_external_id($1)',
-    [externalAuthId]
-  );
+  const user = await dao.users.getByExternalId(externalAuthId);
 &nbsp;
-  if (result.rows.length === 0) {
+  if (!user) {
     throw new Error('user not found');
   }
 &nbsp;
-  const user = result.rows[0];
   return {
     id: user.id,
-    fullName: user.full_name,
+    fullName: user.fullName,
     email: user.email,
     role: user.role,
     phone: user.phone,
-    createdAt: user.created_at,
-    updatedAt: user.updated_at,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
   };
 }
 &nbsp;
 // actualiza el perfil del usuario - solo permite modificar el propio
 export async function updateUser(userId: string, externalAuthId: string, input: UpdateUserInput) {
-  // verificar que el usuario existe y le pertenece
-  const existing = await pool.query(
-    'SELECT * FROM sp_get_user_by_id($1)',
-    [userId]
-  );
+  const existing = await dao.users.getById(userId);
 &nbsp;
-  if (existing.rows.length === 0) {
+  if (!existing) {
     throw new Error('user not found');
   }
 &nbsp;
   // verificar que el usuario autenticado es el dueño del recurso
-  if (existing.rows[0].external_auth_id !== externalAuthId) {
+  if (existing.externalAuthId !== externalAuthId) {
     throw new Error('forbidden: you can only update your own profile');
   }
 &nbsp;
-  const result = await pool.query(
-    'SELECT * FROM sp_update_user($1, $2, $3)',
-    [userId, input.fullName || null, input.phone || null]
-  );
+  const user = await dao.users.update(userId, input);
 &nbsp;
-  const user = result.rows[0];
+  // el sp responde con filas solo si existe y no esta eliminado; aqui
+  // ya lo validamos arriba, asi que user es no-null en el camino feliz
   return {
-    id: user.id,
-    fullName: user.full_name,
-    email: user.email,
-    role: user.role,
-    phone: user.phone,
-    updatedAt: user.updated_at,
+    id: user!.id,
+    fullName: user!.fullName,
+    email: user!.email,
+    role: user!.role,
+    phone: user!.phone,
+    updatedAt: user!.updatedAt,
   };
 }
 &nbsp;
 // soft delete del usuario - solo permite eliminar el propio
 export async function softDeleteUser(userId: string, externalAuthId: string) {
-  const existing = await pool.query(
-    'SELECT * FROM sp_get_user_by_id($1)',
-    [userId]
-  );
+  const existing = await dao.users.getById(userId);
 &nbsp;
-  if (existing.rows.length === 0) {
+  if (!existing) {
     throw new Error('user not found');
   }
 &nbsp;
-  // verificar que el usuario autenticado es el dueño del recurso
-  if (existing.rows[0].external_auth_id !== externalAuthId) {
+  if (existing.externalAuthId !== externalAuthId) {
     throw new Error('forbidden: you can only delete your own account');
   }
 &nbsp;
-  await pool.query('SELECT sp_soft_delete_user($1)', [userId]);
+  await dao.users.softDelete(userId);
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -301,7 +259,7 @@ export async function softDeleteUser(userId: string, externalAuthId: string) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-11T20:03:37.625Z
+                at 2026-04-20T15:31:37.716Z
             </div>
         <script src="../prettify.js"></script>
         <script>

@@ -1,7 +1,7 @@
 import axios from 'axios';
-import pool from '../config/database';
 import { keycloakConfig } from '../config/keycloak';
-import { RegisterInput, LoginInput } from '../schemas/auth.schema';
+import { dao } from '../dao/DaoFactory';
+import { LoginInput, RegisterInput } from '../schemas/auth.schema';
 
 // obtiene un token de admin para llamar a keycloak admin api
 async function getAdminToken(): Promise<string> {
@@ -66,24 +66,25 @@ export async function registerUser(input: RegisterInput) {
     }
   );
 
-  // 5. crear registro local en postgresql usando stored procedure
-  //    si falla, se hace rollback eliminando el usuario de keycloak
+  // 5. crear registro local en postgresql; si falla, rollback del lado de keycloak
+  //    para evitar usuarios huerfanos entre los dos sistemas
   try {
-    const result = await pool.query(
-      'SELECT * FROM sp_create_user($1, $2, $3, $4::user_role, $5)',
-      [input.fullName, input.email, keycloakUserId, input.role, input.phone || null]
-    );
+    const user = await dao.users.create({
+      fullName: input.fullName,
+      email: input.email,
+      externalAuthId: keycloakUserId,
+      role: input.role,
+      phone: input.phone || null,
+    });
 
-    const user = result.rows[0];
     return {
       id: user.id,
-      fullName: user.full_name,
+      fullName: user.fullName,
       email: user.email,
       role: user.role,
       phone: user.phone,
     };
   } catch (dbError) {
-    // rollback: eliminar usuario de keycloak si falla la creacion local
     await axios.delete(
       `${keycloakConfig.adminBaseUrl}/users/${keycloakUserId}`,
       { headers: { Authorization: `Bearer ${adminToken}` } }

@@ -348,14 +348,15 @@ CREATE OR REPLACE FUNCTION sp_create_menu_item(
   p_detalles   VARCHAR(1000),
   p_precio     NUMERIC(10,2),
   p_imagen     VARCHAR(500) DEFAULT NULL,
-  p_disponible BOOLEAN      DEFAULT TRUE
+  p_disponible BOOLEAN      DEFAULT TRUE,
+  p_categoria  VARCHAR(100) DEFAULT 'General'
 )
 RETURNS SETOF itemsDelMenu
 LANGUAGE plpgsql AS $$
 BEGIN
   RETURN QUERY
-  INSERT INTO itemsDelMenu (idMenu, nombre, detalles, precio, imagen, disponible)
-  VALUES (p_id_menu, p_nombre, p_detalles, p_precio, p_imagen, p_disponible)
+  INSERT INTO itemsDelMenu (idMenu, nombre, detalles, categoria, precio, imagen, disponible)
+  VALUES (p_id_menu, p_nombre, p_detalles, p_categoria, p_precio, p_imagen, p_disponible)
   RETURNING *;
 END;
 $$;
@@ -395,7 +396,8 @@ CREATE OR REPLACE FUNCTION sp_update_menu_item(
   p_detalles   VARCHAR(1000)  DEFAULT NULL,
   p_precio     NUMERIC(10,2)  DEFAULT NULL,
   p_imagen     VARCHAR(500)   DEFAULT NULL,
-  p_disponible BOOLEAN        DEFAULT NULL
+  p_disponible BOOLEAN        DEFAULT NULL,
+  p_categoria  VARCHAR(100)   DEFAULT NULL
 )
 RETURNS SETOF itemsDelMenu
 LANGUAGE plpgsql AS $$
@@ -404,6 +406,7 @@ BEGIN
   UPDATE itemsDelMenu SET
     nombre              = COALESCE(p_nombre,     nombre),
     detalles            = COALESCE(p_detalles,   detalles),
+    categoria           = COALESCE(p_categoria,  categoria),
     precio              = COALESCE(p_precio,     precio),
     imagen              = COALESCE(p_imagen,     imagen),
     disponible          = COALESCE(p_disponible, disponible),

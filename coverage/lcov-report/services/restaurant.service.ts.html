@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>13/13</span>
+                <span class='fraction'>11/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>8/8</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>12/12</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
@@ -109,32 +109,13 @@
 <a name='L44'></a><a href='#L44'>44</a>
 <a name='L45'></a><a href='#L45'>45</a>
 <a name='L46'></a><a href='#L46'>46</a>
-<a name='L47'></a><a href='#L47'>47</a>
-<a name='L48'></a><a href='#L48'>48</a>
-<a name='L49'></a><a href='#L49'>49</a>
-<a name='L50'></a><a href='#L50'>50</a>
-<a name='L51'></a><a href='#L51'>51</a>
-<a name='L52'></a><a href='#L52'>52</a>
-<a name='L53'></a><a href='#L53'>53</a>
-<a name='L54'></a><a href='#L54'>54</a>
-<a name='L55'></a><a href='#L55'>55</a>
-<a name='L56'></a><a href='#L56'>56</a>
-<a name='L57'></a><a href='#L57'>57</a>
-<a name='L58'></a><a href='#L58'>58</a>
-<a name='L59'></a><a href='#L59'>59</a>
-<a name='L60'></a><a href='#L60'>60</a>
-<a name='L61'></a><a href='#L61'>61</a>
-<a name='L62'></a><a href='#L62'>62</a>
-<a name='L63'></a><a href='#L63'>63</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+<a name='L47'></a><a href='#L47'>47</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -142,19 +123,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -184,69 +155,50 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import pool from '../config/database';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { dao } from '../dao/DaoFactory';
 import { CreateRestaurantInput } from '../schemas/restaurant.schema';
 &nbsp;
 // crea un restaurante vinculado al admin autenticado
 export async function createRestaurant(adminExternalId: string, input: CreateRestaurantInput) {
-  // buscar el usuario local por su external_auth_id
-  const adminResult = await pool.query(
-    'SELECT * FROM sp_get_user_by_external_id($1)',
-    [adminExternalId]
-  );
+  // resolver el id local del admin antes de persistir el restaurante
+  const adminUser = await dao.users.getByExternalId(adminExternalId);
 &nbsp;
-  if (adminResult.rows.length === 0) {
+  if (!adminUser) {
     throw new Error('admin user not found');
   }
 &nbsp;
-  const adminUser = adminResult.rows[0];
+  const restaurant = await dao.restaurants.create({
+    ...input,
+    adminUserId: adminUser.id,
+  });
 &nbsp;
-  const result = await pool.query(
-    'SELECT * FROM sp_create_restaurant($1, $2, $3, $4, $5, $6)',
-    [
-      input.name,
-      input.description || null,
-      input.address,
-      input.phone || null,
-      input.openingHours || null,
-      adminUser.id,
-    ]
-  );
-&nbsp;
-  const restaurant = result.rows[0];
   return {
     id: restaurant.id,
     name: restaurant.name,
     description: restaurant.description,
     address: restaurant.address,
     phone: restaurant.phone,
-    openingHours: restaurant.opening_hours,
-    adminUserId: restaurant.admin_user_id,
-    createdAt: restaurant.created_at,
+    openingHours: restaurant.openingHours,
+    adminUserId: restaurant.adminUserId,
+    createdAt: restaurant.createdAt,
   };
 }
 &nbsp;
 // lista todos los restaurantes activos (no eliminados) con info del admin
 export async function listRestaurants() {
-  const result = await pool.query('SELECT * FROM sp_list_restaurants()');
+  const restaurants = await dao.restaurants.list();
 &nbsp;
-  return result.rows.map((row) =&gt; ({
-    id: row.id,
-    name: row.name,
-    description: row.description,
-    address: row.address,
-    phone: row.phone,
-    openingHours: row.opening_hours,
-    adminUserId: row.admin_user_id,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-    adminUser: {
-      fullName: row.admin_name,
-      email: row.admin_email,
-    },
+  return restaurants.map((r) =&gt; ({
+    id: r.id,
+    name: r.name,
+    description: r.description,
+    address: r.address,
+    phone: r.phone,
+    openingHours: r.openingHours,
+    adminUserId: r.adminUserId,
+    createdAt: r.createdAt,
+    updatedAt: r.updatedAt,
+    adminUser: r.adminUser,
   }));
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -256,7 +208,7 @@ export async function listRestaurants() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-11T20:03:37.625Z
+                at 2026-04-20T15:31:37.716Z
             </div>
         <script src="../prettify.js"></script>
         <script>
