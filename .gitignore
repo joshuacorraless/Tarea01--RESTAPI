@@ -1,4 +1,41 @@
-node_modules/
-dist/
-.env
 CLAUDE.md
+guia.md
+
+# ===== DEPENDENCIAS =====
+node_modules/
+**/node_modules/
+
+# ===== VARIABLES DE ENTORNO =====
+.env
+.env.local
+.env.production
+.env.development
+**/.env
+**/.env.local
+**/.env.production
+
+# ===== BUILD =====
+dist/
+dist-ssr/
+**/dist/
+
+# ===== LOGS =====
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ===== UPLOADS =====
+uploads/
+**/uploads/
+
+# ===== EDITOR / SO =====
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.sw?
