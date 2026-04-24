@@ -51,8 +51,7 @@ services:
   # =============================================
   api:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./apps/api
     container_name: restaurant-api
     environment:
       PORT: ${PORT}

@@ -19,6 +19,10 @@ dist/
 dist-ssr/
 **/dist/
 
+# ===== COVERAGE =====
+coverage/
+**/coverage/
+
 # ===== LOGS =====
 logs/
 *.log
@@ -39,3 +43,7 @@ uploads/
 Thumbs.db
 *.suo
 *.sw?
+
+#==== DOCS =====
+docs/FUNDAMENTOS-INGENIERILES.md
+GUIA-DEFINITIVA-RESTAURANTES-E2 (4).md
