@@ -8,7 +8,8 @@
     "start": "node dist/server.js",
     "test": "jest --config jest.config.ts",
     "test:coverage": "jest --config jest.config.ts --coverage",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "lint": "echo 'linter no configurado aun'"
   },
   "keywords": [],
   "author": "",
