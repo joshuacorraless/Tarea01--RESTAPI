@@ -1,19 +1,11 @@
 import { env } from '../config/env';
-import { IMenuDao } from './interfaces/IMenuDao';
-import { IMenuItemDao } from './interfaces/IMenuItemDao';
-import { IOrderDao } from './interfaces/IOrderDao';
-import { IReservationDao } from './interfaces/IReservationDao';
-import { IRestaurantDao } from './interfaces/IRestaurantDao';
-import { IUserDao } from './interfaces/IUserDao';
-import { PostgresMenuDao } from './postgres/PostgresMenuDao';
-import { PostgresMenuItemDao } from './postgres/PostgresMenuItemDao';
-import { PostgresOrderDao } from './postgres/PostgresOrderDao';
-import { PostgresReservationDao } from './postgres/PostgresReservationDao';
-import { PostgresRestaurantDao } from './postgres/PostgresRestaurantDao';
-import { PostgresUserDao } from './postgres/PostgresUserDao';
+import type { IMenuDao } from './interfaces/IMenuDao';
+import type { IMenuItemDao } from './interfaces/IMenuItemDao';
+import type { IOrderDao } from './interfaces/IOrderDao';
+import type { IReservationDao } from './interfaces/IReservationDao';
+import type { IRestaurantDao } from './interfaces/IRestaurantDao';
+import type { IUserDao } from './interfaces/IUserDao';
 
-// conjunto completo de DAOs que el resto de la app consume
-// agregar un agregado nuevo => una propiedad mas aqui y una entrada por motor
 export interface DaoRegistry {
   users: IUserDao;
   restaurants: IRestaurantDao;
@@ -23,25 +15,48 @@ export interface DaoRegistry {
   orders: IOrderDao;
 }
 
-// un builder por motor; agregar mongo => una entrada mas en el mapa
-// sin tocar services ni factory ni otros motores
-type DaoEngine = 'postgres' | 'mongo';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+export async function initDaoEngine(): Promise<void> {
+  if (env.DB_ENGINE === 'mongo') {
+    const { connectMongo } = require('../config/database.mongo');
+    await connectMongo();
+  } else {
+    const { connectPostgres } = require('../config/database');
+    await connectPostgres();
+  }
+}
 
-const builders: Record<DaoEngine, () => DaoRegistry> = {
-  postgres: () => ({
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+export const dao: DaoRegistry = (() => {
+  if (env.DB_ENGINE === 'mongo') {
+    const { MongoUserDao } = require('./mongo/MongoUserDao');
+    const { MongoRestaurantDao } = require('./mongo/MongoRestaurantDao');
+    const { MongoMenuDao } = require('./mongo/MongoMenuDao');
+    const { MongoMenuItemDao } = require('./mongo/MongoMenuItemDao');
+    const { MongoReservationDao } = require('./mongo/MongoReservationDao');
+    const { MongoOrderDao } = require('./mongo/MongoOrderDao');
+    return {
+      users: new MongoUserDao(),
+      restaurants: new MongoRestaurantDao(),
+      menus: new MongoMenuDao(),
+      menuItems: new MongoMenuItemDao(),
+      reservations: new MongoReservationDao(),
+      orders: new MongoOrderDao(),
+    };
+  }
+
+  const { PostgresUserDao } = require('./postgres/PostgresUserDao');
+  const { PostgresRestaurantDao } = require('./postgres/PostgresRestaurantDao');
+  const { PostgresMenuDao } = require('./postgres/PostgresMenuDao');
+  const { PostgresMenuItemDao } = require('./postgres/PostgresMenuItemDao');
+  const { PostgresReservationDao } = require('./postgres/PostgresReservationDao');
+  const { PostgresOrderDao } = require('./postgres/PostgresOrderDao');
+  return {
     users: new PostgresUserDao(),
     restaurants: new PostgresRestaurantDao(),
     menus: new PostgresMenuDao(),
     menuItems: new PostgresMenuItemDao(),
     reservations: new PostgresReservationDao(),
     orders: new PostgresOrderDao(),
-  }),
-  mongo: () => {
-    // stub hasta que exista src/dao/mongo con las implementaciones
-    throw new Error('adaptador mongo no implementado aun');
-  },
-};
-
-// punto unico de seleccion del motor de persistencia
-// un unico lookup en el mapa; no hay cadenas de if por agregado
-export const dao: DaoRegistry = builders[env.DB_ENGINE]();
+  };
+})();

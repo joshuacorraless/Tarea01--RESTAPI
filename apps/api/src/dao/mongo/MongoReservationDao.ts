@@ -1,0 +1,117 @@
+import {
+  CreateReservationData,
+  IReservationDao,
+  ReservationRecord,
+  TableRecord,
+} from '../interfaces/IReservationDao';
+import { ReservationDocument, ReservationModel } from './models/ReservationModel';
+import { TableModel } from './models/TableModel';
+
+function mapReservation(doc: ReservationDocument): ReservationRecord {
+  return {
+    id: doc._id,
+    idRestaurante: doc.idRestaurante,
+    mesaId: doc.mesaId,
+    idClienteUsuario: doc.idClienteUsuario,
+    tamannoReserva: doc.tamannoReserva,
+    reservadoPara: doc.reservadoPara,
+    duracionReserva: doc.duracionReserva,
+    estado: doc.estado,
+    notas: doc.notas,
+    creadoEn: doc.creadoEn,
+    ultimaActualizacion: doc.ultimaActualizacion,
+  };
+}
+
+export class MongoReservationDao implements IReservationDao {
+  async getAvailableTables(
+    restaurantId: string,
+    reservadoPara: Date,
+    duracion: number = 90,
+  ): Promise<TableRecord[]> {
+    const endTime = new Date(reservadoPara.getTime() + duracion * 60 * 1000);
+
+    // IDs de mesas que tienen reservas que solapan con la ventana solicitada.
+    // Dos intervalos se solapan cuando: inicio1 < fin2 AND inicio2 < fin1
+    const busyTableIds = await ReservationModel.distinct('mesaId', {
+      idRestaurante: restaurantId,
+      estado: { $in: ['pendiente', 'confirmada'] },
+      deletedAt: null,
+      $expr: {
+        $and: [
+          { $lt: ['$reservadoPara', endTime] },
+          {
+            $gt: [
+              { $add: ['$reservadoPara', { $multiply: ['$duracionReserva', 60000] }] },
+              reservadoPara,
+            ],
+          },
+        ],
+      },
+    });
+
+    const tables = await TableModel.find({
+      idRestaurante: restaurantId,
+      disponible: true,
+      _id: { $nin: busyTableIds },
+    });
+
+    return tables.map((t) => ({
+      id: t._id,
+      idRestaurante: t.idRestaurante,
+      numeroMesa: t.numeroMesa,
+      capacidad: t.capacidad,
+      disponible: t.disponible,
+    }));
+  }
+
+  async create(data: CreateReservationData): Promise<ReservationRecord> {
+    const doc = await ReservationModel.create({
+      idRestaurante: data.idRestaurante,
+      mesaId: data.mesaId,
+      idClienteUsuario: data.idClienteUsuario,
+      tamannoReserva: data.tamannoReserva,
+      reservadoPara: data.reservadoPara,
+      duracionReserva: data.duracionReserva ?? 90,
+      notas: data.notas ?? null,
+    });
+    return mapReservation(doc);
+  }
+
+  async getById(id: string): Promise<ReservationRecord | null> {
+    const doc = await ReservationModel.findOne({ _id: id, deletedAt: null });
+    if (!doc) return null;
+    return mapReservation(doc);
+  }
+
+  async getByClient(clientId: string): Promise<ReservationRecord[]> {
+    const docs = await ReservationModel.find({
+      idClienteUsuario: clientId,
+      deletedAt: null,
+    });
+    return docs.map(mapReservation);
+  }
+
+  async getByRestaurant(restaurantId: string): Promise<ReservationRecord[]> {
+    const docs = await ReservationModel.find({
+      idRestaurante: restaurantId,
+      deletedAt: null,
+    });
+    return docs.map(mapReservation);
+  }
+
+  async cancel(id: string, clientId: string): Promise<ReservationRecord | null> {
+    const doc = await ReservationModel.findOneAndUpdate(
+      {
+        _id: id,
+        idClienteUsuario: clientId,
+        estado: { $nin: ['cancelada', 'completada'] },
+        deletedAt: null,
+      },
+      { $set: { estado: 'cancelada' } },
+      { new: true },
+    );
+    if (!doc) return null;
+    return mapReservation(doc);
+  }
+}
