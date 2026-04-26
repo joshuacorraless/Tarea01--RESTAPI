@@ -1,0 +1,79 @@
+# Config Server Replica Set (csrs)
+# Guarda los metadatos del sharded cluster: qué chunk vive en qué shard.
+# 1 pod en este proyecto (en producción real serían 3 con priority/elección).
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: configsvr
+spec:
+  clusterIP: None              # headless — DNS por pod
+  publishNotReadyAddresses: true   # publica DNS aunque el pod no esté Ready (clave para rs.initiate)
+  selector:
+    app: configsvr
+  ports:
+    - port: 27017
+      targetPort: 27017
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: configsvr
+spec:
+  serviceName: configsvr
+  replicas: 1
+  selector:
+    matchLabels:
+      app: configsvr
+  template:
+    metadata:
+      labels:
+        app: configsvr
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:7
+          command:
+            - mongod
+            - "--configsvr"
+            - "--replSet"
+            - "csrs"
+            - "--port"
+            - "27017"          # explícito: --configsvr defaultea a 27019
+            - "--bind_ip_all"
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: configsvr-data
+              mountPath: /data/db
+          readinessProbe:
+            exec:
+              command:
+                - mongosh
+                - "--port"
+                - "27017"
+                - "--quiet"
+                - "--eval"
+                - "db.adminCommand('ping').ok"
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            exec:
+              command:
+                - mongosh
+                - "--port"
+                - "27017"
+                - "--quiet"
+                - "--eval"
+                - "db.adminCommand('ping').ok"
+            initialDelaySeconds: 30
+            periodSeconds: 20
+  volumeClaimTemplates:
+    - metadata:
+        name: configsvr-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
