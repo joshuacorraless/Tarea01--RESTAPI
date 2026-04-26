@@ -9,13 +9,13 @@
 #   │                  Docker Desktop K8s                         │
 #   │                                                              │
 #   │   [mongos]  ──────────────► [csrs] (config server RS)       │
-#   │      │                       configsvr-0                     │
+#   │      │                       configsvr-0 (P), -1, -2         │
 #   │      │                                                       │
 #   │      ├──► [rs0 / shard1]  shard1-0 (P), shard1-1, shard1-2  │
 #   │      │                                                       │
 #   │      └──► [rs1 / shard2]  shard2-0 (P), shard2-1, shard2-2  │
 #   │                                                              │
-#   │   Total: 8 pods (1 csrs + 3 rs0 + 3 rs1 + 1 mongos)          │
+#   │   Total: 10 pods (3 csrs + 3 rs0 + 3 rs1 + 1 mongos)         │
 #   └────────────────────────────────────────────────────────────┘
 #
 # Distribución de datos:
@@ -64,8 +64,8 @@ verify_mesh() {
 # ────────────────────────────────────────────────────────────────────
 # 1. Esperar que todos los pods respondan a ping
 # ────────────────────────────────────────────────────────────────────
-echo "═══ [1/5] Esperando que los 7 pods de mongod respondan ═══"
-for pod in configsvr-0 shard1-0 shard1-1 shard1-2 shard2-0 shard2-1 shard2-2; do
+echo "═══ [1/5] Esperando que los 9 pods de mongod respondan ═══"
+for pod in configsvr-0 configsvr-1 configsvr-2 shard1-0 shard1-1 shard1-2 shard2-0 shard2-1 shard2-2; do
   wait_for_pod "$pod"
 done
 
@@ -75,14 +75,18 @@ done
 echo ""
 echo "═══ [2/5] Inicializando replica sets ═══"
 
-echo "→ csrs (config server) — verificando DNS antes de initiate"
-verify_mesh configsvr-0 configsvr-0.configsvr:27017
+echo "→ csrs (config server) — verificando malla DNS antes de initiate"
+verify_mesh configsvr-0 configsvr-0.configsvr:27017 configsvr-1.configsvr:27017 configsvr-2.configsvr:27017
 kubectl exec configsvr-0 -- mongosh --port 27017 admin --quiet --eval "
 try {
   rs.initiate({
     _id: 'csrs',
     configsvr: true,
-    members: [{ _id: 0, host: 'configsvr-0.configsvr:27017' }]
+    members: [
+      { _id: 0, host: 'configsvr-0.configsvr:27017', priority: 2 },
+      { _id: 1, host: 'configsvr-1.configsvr:27017', priority: 1 },
+      { _id: 2, host: 'configsvr-2.configsvr:27017', priority: 1 }
+    ]
   });
 } catch (e) {
   if (e.codeName === 'AlreadyInitialized') print('  csrs ya estaba inicializado, continuando');
@@ -130,8 +134,22 @@ try {
 # 3. Esperar elección de primarios y que mongos esté listo
 # ────────────────────────────────────────────────────────────────────
 echo ""
-echo "═══ [3/5] Esperando elección de primarios (25s) ═══"
-sleep 25
+echo "═══ [3/5] Esperando elección de primarios ═══"
+
+wait_for_primary() {
+  local pod=$1
+  local rs=$2
+  echo "→ Esperando primario de $rs (en $pod)..."
+  until kubectl exec "$pod" -- mongosh --port 27017 --quiet --eval \
+    "rs.status().members.some(m => m.stateStr === 'PRIMARY')" 2>/dev/null | grep -q "true"; do
+    sleep 3
+  done
+  echo "  ✓ $rs tiene primario"
+}
+
+wait_for_primary configsvr-0 csrs
+wait_for_primary shard1-0 rs0
+wait_for_primary shard2-0 rs1
 
 MONGOS_POD=$(kubectl get pod -l app=mongos -o jsonpath='{.items[0].metadata.name}')
 echo "Mongos pod: $MONGOS_POD"
@@ -180,7 +198,7 @@ echo "════════════════════════�
 echo "✓ Sharded cluster MongoDB listo."
 echo ""
 echo "Topología final:"
-echo "  csrs                 → configsvr-0"
+echo "  csrs                 → configsvr-0 (P), configsvr-1 (S), configsvr-2 (S)"
 echo "  rs0  (shard1)        → shard1-0 (P), shard1-1 (S), shard1-2 (S)"
 echo "  rs1  (shard2)        → shard2-0 (P), shard2-1 (S), shard2-2 (S)"
 echo "  mongos               → punto de entrada del cluster"

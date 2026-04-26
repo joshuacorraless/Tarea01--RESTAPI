@@ -1,6 +1,6 @@
 # Config Server Replica Set (csrs)
 # Guarda los metadatos del sharded cluster: qué chunk vive en qué shard.
-# 1 pod en este proyecto (en producción real serían 3 con priority/elección).
+# 3 pods (1 primary + 2 secondary) — topología productiva, evita SPOF de los metadatos.
 ---
 apiVersion: v1
 kind: Service
@@ -21,7 +21,7 @@ metadata:
   name: configsvr
 spec:
   serviceName: configsvr
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: configsvr
@@ -47,26 +47,14 @@ spec:
             - name: configsvr-data
               mountPath: /data/db
           readinessProbe:
-            exec:
-              command:
-                - mongosh
-                - "--port"
-                - "27017"
-                - "--quiet"
-                - "--eval"
-                - "db.adminCommand('ping').ok"
+            tcpSocket:
+              port: 27017
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 6
           livenessProbe:
-            exec:
-              command:
-                - mongosh
-                - "--port"
-                - "27017"
-                - "--quiet"
-                - "--eval"
-                - "db.adminCommand('ping').ok"
+            tcpSocket:
+              port: 27017
             initialDelaySeconds: 30
             periodSeconds: 20
   volumeClaimTemplates:

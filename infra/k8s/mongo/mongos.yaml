@@ -23,7 +23,7 @@ spec:
           command:
             - mongos
             - "--configdb"
-            - "csrs/configsvr-0.configsvr:27017"   # apunta al config server RS, NO a un shard
+            - "csrs/configsvr-0.configsvr:27017,configsvr-1.configsvr:27017,configsvr-2.configsvr:27017"   # los 3 miembros del config server RS
             - "--bind_ip_all"
             - "--port"
             - "27017"
@@ -38,8 +38,9 @@ spec:
                 - "--quiet"
                 - "--eval"
                 - "db.adminCommand('ping').ok"
-            initialDelaySeconds: 15
-            periodSeconds: 10
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 15
             failureThreshold: 10
 ---
 apiVersion: v1
