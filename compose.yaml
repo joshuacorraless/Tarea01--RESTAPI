@@ -47,6 +47,25 @@ services:
         condition: service_healthy
 
   # =============================================
+  # mongodb - base de datos documental (fase 4)
+  # standalone para dev local; el replica set real va en k8s (paso 4.2)
+  # =============================================
+  mongo:
+    image: mongo:7
+    container_name: restaurant-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: restaurant_db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =============================================
   # api - nuestra rest api
   # =============================================
   api:
@@ -62,6 +81,9 @@ services:
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
       KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID}
       KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
+      # activar motor mongo: DB_ENGINE=mongo + MONGODB_URI apuntando al servicio
+      DB_ENGINE: ${DB_ENGINE:-postgres}
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/restaurant_db}
     ports:
       - "${PORT}:${PORT}"
     depends_on:
@@ -69,6 +91,9 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_started
+      mongo:
+        condition: service_healthy
 
 volumes:
   postgres_data:
+  mongo_data:

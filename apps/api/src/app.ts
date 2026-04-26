@@ -1,7 +1,10 @@
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
 import routes from './routes';
 import { errorHandler } from './middlewares/error.middleware';
-import { setupSwagger } from './docs/swagger';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const swaggerDocument = require('./docs/swagger.json');
 
 const app = express();
 
@@ -9,7 +12,7 @@ const app = express();
 app.use(express.json());
 
 // documentacion swagger en /api-docs
-setupSwagger(app);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // rutas bajo prefijo /api
 app.use('/api', routes);
