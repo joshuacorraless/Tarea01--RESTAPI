@@ -30,3 +30,10 @@ jest.mock("../config/keycloak", () => ({
     clientSecret: "test-secret",
   },
 }));
+
+// Redis retorna null en tests: el cache middleware llama next() y los controllers
+// ejecutan la invalidacion sin efecto — ningun test necesita Redis real.
+jest.mock("../config/redis", () => ({
+  connectRedis: jest.fn().mockResolvedValue(undefined),
+  getRedisClient: jest.fn().mockReturnValue(null),
+}));

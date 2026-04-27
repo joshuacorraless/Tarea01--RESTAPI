@@ -18,6 +18,8 @@ const envSchema = z.object({
   MONGODB_URI: z.string().optional(),
   // nombre del replica set; vacio para standalone (desarrollo local sin replica)
   MONGO_REPLICA_SET: z.string().optional(),
+  // URL de Redis para cache; si no se define, el cache queda deshabilitado
+  REDIS_URL: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
