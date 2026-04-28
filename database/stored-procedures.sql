@@ -713,3 +713,35 @@ BEGIN
   ORDER BY creadoEn DESC;
 END;
 $$;
+
+-- =============================================
+-- sp_get_all_menu_items: obtener todos los items de menu (para reindex de elasticsearch)
+-- =============================================
+CREATE OR REPLACE FUNCTION sp_get_all_menu_items()
+RETURNS TABLE(
+  id            UUID,
+  idmenu        UUID,
+  restaurantid  UUID,
+  nombre        VARCHAR,
+  categoria     VARCHAR,
+  detalles      VARCHAR,
+  precio        NUMERIC,
+  disponible    BOOLEAN
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    i.id,
+    i.idMenu,
+    m.idRestaurante,
+    i.nombre,
+    i.categoria,
+    i.detalles,
+    i.precio,
+    i.disponible
+  FROM itemsDelMenu i
+  JOIN menus m ON m.id = i.idMenu
+  WHERE i.eliminadoEn IS NULL
+    AND m.eliminadoEn IS NULL;
+END;
+$$ LANGUAGE plpgsql;

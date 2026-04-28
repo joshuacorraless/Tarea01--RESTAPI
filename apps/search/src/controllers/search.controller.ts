@@ -21,16 +21,16 @@ export async function searchByCategory(req: Request, res: Response) {
 
 export async function reindex(req: Request, res: Response) {
   // Pedirle a la API principal todos los ítems de menú
-  const response = await fetch(`${env.API_INTERNAL_URL}/api/menu-items/all`);
+  const response = await fetch(`${env.API_INTERNAL_URL}/api/menus/items/all`);
 
   if (!response.ok) {
     return res.status(502).json({ error: 'No se pudo obtener los productos de la API' });
   }
 
-  const data = await response.json() as { items: any[] };
+  const data = await response.json() as { success: boolean, data: any[] };
 
   // Mapear los campos de la BD al formato del documento ES
-  const products: SearchService.ProductDocument[] = data.items.map(item => ({
+  const products = data.data.map(item => ({
     id: item.id,
     restaurantId: item.restaurantId, // viene del JOIN que hace la API
     menuId: item.idMenu,
