@@ -1,4 +1,5 @@
 import { dao } from '../dao/DaoFactory';
+import { MenuItemRecord } from '../dao/interfaces/IMenuItemDao';
 import {
   CreateMenuInput,
   CreateMenuItemInput,
@@ -36,6 +37,10 @@ export async function createMenuItemService(menuId: string, input: CreateMenuIte
 
 export async function getMenuItemsService(menuId: string) {
   return dao.menuItems.getByMenu(menuId);
+}
+
+export async function getAllMenuItemsService(): Promise<MenuItemRecord[]> {
+  return dao.menuItems.findAll();
 }
 
 export async function updateMenuItemService(itemId: string, input: UpdateMenuItemInput) {

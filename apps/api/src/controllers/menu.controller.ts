@@ -10,6 +10,7 @@ import {
   getMenuItemsService,
   updateMenuItemService,
   deleteMenuItemService,
+  getAllMenuItemsService,
 } from '../services/menu.service';
 import { sendSuccess, sendError } from '../utils/response';
 
@@ -83,6 +84,15 @@ export async function getMenuItems(req: AuthenticatedRequest, res: Response): Pr
   try {
     const items = await getMenuItemsService(req.params.menuId);
     sendSuccess(res, items, 'item del menu encontrado');
+  } catch (error: any) {
+    sendError(res, error.message, 500);
+  }
+}
+
+export async function getAllMenuItems(req: AuthenticatedRequest, res: Response): Promise<void> {
+  try {
+    const items = await getAllMenuItemsService();
+    sendSuccess(res, items, 'items encontrados');
   } catch (error: any) {
     sendError(res, error.message, 500);
   }

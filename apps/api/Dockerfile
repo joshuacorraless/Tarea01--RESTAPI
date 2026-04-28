@@ -1,5 +1,7 @@
 FROM node:20-alpine
 
+RUN apk add --no-cache wget
+
 WORKDIR /app
 
 # copiar archivos de dependencias primero (para cachear la capa de npm install)
