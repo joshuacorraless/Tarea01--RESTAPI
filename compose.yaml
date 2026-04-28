@@ -12,8 +12,6 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      # los archivos en /docker-entrypoint-initdb.d se ejecutan automaticamente
-      # al crear la base de datos por primera vez (en orden alfabetico)
       - ./database/00-create-databases.sql:/docker-entrypoint-initdb.d/00-create-databases.sql
       - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
       - ./database/stored-procedures.sql:/docker-entrypoint-initdb.d/02-stored-procedures.sql
@@ -32,10 +30,8 @@ services:
     container_name: restaurant-keycloak
     command: start-dev
     environment:
-      # credenciales del admin console de keycloak
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_ADMIN_USERNAME}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
-      # base de datos de keycloak (usa el mismo postgres)
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak_db
       KC_DB_USERNAME: ${POSTGRES_USER}
@@ -45,6 +41,24 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  # =============================================
+  # mongodb - base de datos documental
+  # =============================================
+  mongo:
+    image: mongo:7
+    container_name: restaurant-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: restaurant_db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # =============================================
   # api - nuestra rest api
@@ -62,6 +76,8 @@ services:
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
       KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID}
       KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
+      DB_ENGINE: ${DB_ENGINE:-postgres}
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/restaurant_db}
     ports:
       - "${PORT}:${PORT}"
     depends_on:
@@ -69,6 +85,8 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_started
+      mongo:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:${PORT}/health"]
       interval: 10s
@@ -77,7 +95,7 @@ services:
       start_period: 15s
 
   # =============================================
-  # search - servicio de búsqueda
+  # elasticsearch
   # =============================================
   elasticsearch:
     image: elasticsearch:8.13.0
@@ -95,6 +113,9 @@ services:
       timeout: 10s
       retries: 5
 
+  # =============================================
+  # search - microservicio de busqueda
+  # =============================================
   search:
     build: ./apps/search
     ports:
@@ -110,5 +131,6 @@ services:
         condition: service_healthy
 
 volumes:
-  es_data:
   postgres_data:
+  mongo_data:
+  es_data:

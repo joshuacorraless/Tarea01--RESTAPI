@@ -211,7 +211,7 @@ Resumen de rutas:
 Las pruebas cubren controladores, servicios y utilidades. Están en `src/__tests__/` y se ejecutan con Jest sin necesidad de Docker ni base de datos real (todo está simulado con mocks).
 
 ```bash
-# Correr todas las pruebas
+# Correr todas las pruebas unitarias
 npm test
 
 # Ver reporte de cobertura en la terminal
