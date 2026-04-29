@@ -9,6 +9,7 @@ import {
   getMenuItems,
   updateMenuItem,
   deleteMenuItem,
+  getAllMenuItems,
 } from "../controllers/menu.controller";
 import { authenticate } from "../middlewares/auth.middleware";
 import { authorize } from "../middlewares/role.middleware";
@@ -53,8 +54,10 @@ router.delete(
 );
 
 // ── items del menu ────────────────────────────────────────────────────────────
-
+router.get('/items/all', getAllMenuItems);
 router.get("/:menuId/items", cacheMiddleware(60) as any, getMenuItems);
+
+
 router.post(
   "/:menuId/items",
   authenticate as any,

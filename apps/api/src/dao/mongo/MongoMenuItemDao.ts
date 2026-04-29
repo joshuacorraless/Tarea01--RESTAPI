@@ -1,9 +1,9 @@
 import {
   CreateMenuItemInput,
   UpdateMenuItemInput,
-} from '../../schemas/menu-reservation-order.schema';
-import { IMenuItemDao, MenuItemRecord } from '../interfaces/IMenuItemDao';
-import { MenuItemDocument, MenuItemModel } from './models/MenuItemModel';
+} from "../../schemas/menu-reservation-order.schema";
+import { IMenuItemDao, MenuItemRecord } from "../interfaces/IMenuItemDao";
+import { MenuItemDocument, MenuItemModel } from "./models/MenuItemModel";
 
 function mapMenuItem(doc: MenuItemDocument): MenuItemRecord {
   return {
@@ -21,12 +21,15 @@ function mapMenuItem(doc: MenuItemDocument): MenuItemRecord {
 }
 
 export class MongoMenuItemDao implements IMenuItemDao {
-  async create(menuId: string, input: CreateMenuItemInput): Promise<MenuItemRecord> {
+  async create(
+    menuId: string,
+    input: CreateMenuItemInput,
+  ): Promise<MenuItemRecord> {
     const doc = await MenuItemModel.create({
       idMenu: menuId,
       nombre: input.nombre,
       detalles: input.detalles,
-      categoria: input.categoria ?? 'General',
+      categoria: input.categoria ?? "General",
       precio: input.precio,
       imagen: input.imagen ?? null,
       disponible: input.disponible ?? true,
@@ -39,7 +42,56 @@ export class MongoMenuItemDao implements IMenuItemDao {
     return docs.map(mapMenuItem);
   }
 
-  async update(itemId: string, input: UpdateMenuItemInput): Promise<MenuItemRecord | null> {
+  async findAll(): Promise<MenuItemRecord[]> {
+    const docs = await MenuItemModel.aggregate([
+      { $match: { deletedAt: null } },
+      // join con menus para obtener restaurantId
+      {
+        $lookup: {
+          from: "menus",
+          localField: "idMenu",
+          foreignField: "_id",
+          as: "menu",
+        },
+      },
+      { $unwind: "$menu" },
+      { $match: { "menu.deletedAt": null } },
+      {
+        $project: {
+          _id: 1,
+          idMenu: 1,
+          restaurantId: "$menu.idRestaurante",
+          nombre: 1,
+          categoria: 1,
+          detalles: 1,
+          precio: 1,
+          imagen: 1,
+          disponible: 1,
+          creadoEn: 1,
+          ultimaActualizacion: 1,
+        },
+      },
+    ]);
+
+    return docs.map((doc) => ({
+      id: doc._id,
+      idMenu: doc.idMenu,
+      restaurantId: doc.restaurantId,
+      nombre: doc.nombre,
+      detalles: doc.detalles,
+      categoria: doc.categoria,
+      precio: doc.precio,
+      imagen: doc.imagen,
+      disponible: doc.disponible,
+      creadoEn: doc.creadoEn,
+      ultimaActualizacion: doc.ultimaActualizacion,
+    }));
+  }
+
+  async update(
+    itemId: string,
+    input: UpdateMenuItemInput,
+  ): Promise<MenuItemRecord | null> {
     const updates: Partial<MenuItemDocument> = {};
     if (input.nombre !== undefined) updates.nombre = input.nombre;
     if (input.detalles !== undefined) updates.detalles = input.detalles;
