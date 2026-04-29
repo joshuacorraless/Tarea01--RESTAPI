@@ -20,13 +20,14 @@ import {
   createMenuItemSchema,
   updateMenuItemSchema,
 } from "../schemas/menu-reservation-order.schema";
+import { cacheMiddleware } from "../middlewares/cache.middleware";
 
 const router = Router();
 
 // ── rutas fijas primero (antes de cualquier /:param) ──────────────────────────
 
-// menus
-router.get("/restaurant/:restaurantId", getMenusByRestaurant);
+// menus — cache 2 minutos en GETs publicos
+router.get("/restaurant/:restaurantId", cacheMiddleware(120) as any, getMenusByRestaurant);
 router.post(
   "/",
   authenticate as any,
@@ -37,7 +38,7 @@ router.post(
 
 // ── rutas con /:id despues ────────────────────────────────────────────────────
 
-router.get("/:id", getMenuById);
+router.get("/:id", cacheMiddleware(120) as any, getMenuById);
 router.put(
   "/:id",
   authenticate as any,
@@ -53,9 +54,10 @@ router.delete(
 );
 
 // ── items del menu ────────────────────────────────────────────────────────────
-
 router.get('/items/all', getAllMenuItems);
-router.get("/:menuId/items", getMenuItems);
+router.get("/:menuId/items", cacheMiddleware(60) as any, getMenuItems);
+
+
 router.post(
   "/:menuId/items",
   authenticate as any,

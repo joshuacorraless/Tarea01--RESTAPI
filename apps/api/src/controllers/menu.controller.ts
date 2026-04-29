@@ -13,12 +13,15 @@ import {
   getAllMenuItemsService,
 } from '../services/menu.service';
 import { sendSuccess, sendError } from '../utils/response';
+import { invalidateCache } from '../middlewares/cache.middleware';
 
 // menus
 
 export async function createMenu(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     const menu = await createMenuService(req.body);
+    // invalidar el listado de menus del restaurante afectado
+    await invalidateCache(`cache:/api/menus/restaurant/${req.body.idRestaurante}`);
     sendSuccess(res, menu, 'menu creado exitosamente', 201);
   } catch (error: any) {
     sendError(res, error.message, 500);
@@ -54,6 +57,11 @@ export async function updateMenu(req: AuthenticatedRequest, res: Response): Prom
       sendError(res, 'menu no encontrado', 404);
       return;
     }
+    // invalidar el menu especifico y todos los listados de restaurante (no sabemos a cual pertenece el menu)
+    await invalidateCache(
+      `cache:/api/menus/${req.params.id}`,
+      'cache:/api/menus/restaurant/*',
+    );
     sendSuccess(res, menu, 'menu actualizado ');
   } catch (error: any) {
     sendError(res, error.message, 500);
@@ -63,6 +71,11 @@ export async function updateMenu(req: AuthenticatedRequest, res: Response): Prom
 export async function deleteMenu(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     await deleteMenuService(req.params.id);
+    await invalidateCache(
+      `cache:/api/menus/${req.params.id}`,
+      `cache:/api/menus/${req.params.id}/items`,
+      'cache:/api/menus/restaurant/*',
+    );
     sendSuccess(res, null, 'menu eliminado exitosamente');
   } catch (error: any) {
     sendError(res, error.message, 500);
@@ -74,6 +87,7 @@ export async function deleteMenu(req: AuthenticatedRequest, res: Response): Prom
 export async function createMenuItem(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     const item = await createMenuItemService(req.params.menuId, req.body);
+    await invalidateCache(`cache:/api/menus/${req.params.menuId}/items`);
     sendSuccess(res, item, 'item del menu creado exitosamente', 201);
   } catch (error: any) {
     sendError(res, error.message, 500);
@@ -105,6 +119,7 @@ export async function updateMenuItem(req: AuthenticatedRequest, res: Response): 
       sendError(res, 'item del menu no encontrado', 404);
       return;
     }
+    await invalidateCache(`cache:/api/menus/${req.params.menuId}/items`);
     sendSuccess(res, item, 'item del menu actualizado exitosamente');
   } catch (error: any) {
     sendError(res, error.message, 500);
@@ -114,6 +129,7 @@ export async function updateMenuItem(req: AuthenticatedRequest, res: Response): 
 export async function deleteMenuItem(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     await deleteMenuItemService(req.params.itemId);
+    await invalidateCache(`cache:/api/menus/${req.params.menuId}/items`);
     sendSuccess(res, null, 'item del menu eliminado exitosamente');
   } catch (error: any) {
     sendError(res, error.message, 500);
