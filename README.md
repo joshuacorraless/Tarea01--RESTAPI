@@ -11,12 +11,48 @@ Para el curso de Bases de Datos 2, desarollamos una API REST para la gestión de
 ## Requisitos
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) corriendo
+- Kubernetes de Docker Desktop activado si se quiere correr la demo de orquestación
+- `kubectl` en PATH para el despliegue Kubernetes
 - Node.js 20+ (solo para correr las pruebas localmente)
 - npm
 
 ---
 
+## Dos formas de correr el proyecto
+
+Este repo tiene dos caminos:
+
+| Modo | Comando principal | Para qué sirve |
+|------|-------------------|----------------|
+| Docker Compose | `docker compose up -d` | Desarrollo local rápido con API, PostgreSQL y Keycloak |
+| Kubernetes | `.\infra\k8s\deploy.ps1 -DbEngine mongo` | Demo de orquestación, sharding, Ingress y escalado horizontal |
+
+La guía completa del modo Kubernetes está en `infra/k8s/README.md`.
+
+---
+
+## Secrets locales
+
+Los manifests `secret.yaml` de Kubernetes no se versionan. El import local del
+realm de Keycloak tampoco se versiona porque contiene los client secrets. Cada
+máquina debe crearlos localmente copiando las plantillas:
+
+```powershell
+Copy-Item infra\k8s\common\api\secret.example.yaml infra\k8s\common\api\secret.yaml
+Copy-Item infra\k8s\common\keycloak\secret.example.yaml infra\k8s\common\keycloak\secret.yaml
+Copy-Item infra\k8s\common\keycloak\realm-configmap.example.yaml infra\k8s\common\keycloak\realm-configmap.yaml
+Copy-Item infra\k8s\postgres\secret.example.yaml infra\k8s\postgres\secret.yaml
+```
+
+Para la demo local, los valores de `KEYCLOAK_CLIENT_SECRET` y
+`KEYCLOAK_ADMIN_CLIENT_SECRET` deben coincidir con los secrets declarados en
+`infra/k8s/common/keycloak/realm-configmap.yaml`.
+
+---
+
 ## Levantar el proyecto
+
+### Opción A: Docker Compose
 
 ```bash
 docker compose up -d
@@ -46,11 +82,40 @@ Para detener y borrar los volúmenes (reset completo de la base de datos):
 docker compose down -v
 ```
 
+### Opción B: Kubernetes en Docker Desktop
+
+Primero instalá el NGINX Ingress Controller una vez por máquina, como se
+explica en `infra/k8s/README.md`. Luego:
+
+```powershell
+.\infra\k8s\deploy.ps1 -DbEngine mongo
+```
+
+En modo Kubernetes la API queda expuesta por Ingress en:
+
+```text
+http://localhost/api/...
+http://localhost/search/...
+```
+
+Para limpiar el namespace completo:
+
+```powershell
+.\infra\k8s\destroy.ps1
+```
+
 ---
 
 ## Configuración de Keycloak (primer uso)
 
-Keycloak es el servicio que maneja autenticación y tokens JWT. La primera vez que se levante el proyecto hay que configurarlo manualmente. Solo se hace una vez.
+Keycloak es el servicio que maneja autenticación y tokens JWT.
+
+En **Docker Compose**, la configuración puede hacerse manualmente con los pasos
+de esta sección.
+
+En **Kubernetes**, el realm, clients, roles y service account se importan
+automáticamente desde `infra/k8s/common/keycloak/realm-configmap.yaml`; no hay
+que hacer estos pasos a mano.
 
 ### 1. Entrar al admin console
 
@@ -154,7 +219,8 @@ El `accessToken` tiene una duración de 5 minutos. Cada usuario tiene un rol: `c
 La documentación interactiva y completa de la API la podemos encontrar en Swagger:
 
 ```
-http://localhost:3000/api-docs
+Docker Compose: http://localhost:3000/api-docs
+Kubernetes:     http://localhost/api-docs
 ```
 
 Resumen de rutas:

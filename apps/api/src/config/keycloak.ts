@@ -9,9 +9,12 @@ export const keycloakConfig = {
   clientSecret: env.KEYCLOAK_CLIENT_SECRET,
   adminClientId: env.KEYCLOAK_ADMIN_CLIENT_ID,
   adminClientSecret: env.KEYCLOAK_ADMIN_CLIENT_SECRET,
+  masterAdminUsername: env.KEYCLOAK_MASTER_ADMIN_USERNAME,
+  masterAdminPassword: env.KEYCLOAK_MASTER_ADMIN_PASSWORD,
 
   // openid connect endpoints
   tokenUrl: `${env.KEYCLOAK_BASE_URL}/realms/${env.KEYCLOAK_REALM}/protocol/openid-connect/token`,
+  masterTokenUrl: `${env.KEYCLOAK_BASE_URL}/realms/master/protocol/openid-connect/token`,
   jwksUri: `${env.KEYCLOAK_BASE_URL}/realms/${env.KEYCLOAK_REALM}/protocol/openid-connect/certs`,
   issuer: `${env.KEYCLOAK_BASE_URL}/realms/${env.KEYCLOAK_REALM}`,
 

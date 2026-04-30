@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
+    "postbuild": "node -e \"require('fs').copyFileSync('src/docs/swagger.json','dist/docs/swagger.json')\"",
     "start": "node dist/server.js",
     "test": "jest --config jest.config.ts",
     "test:coverage": "jest --config jest.config.ts --coverage",

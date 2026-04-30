@@ -1,0 +1,21 @@
+# Configuración de Redis idéntica a infra/redis/redis.conf.
+# Cache LRU sin persistencia — pérdida de datos en restart es aceptable
+# porque Redis se usa solo como caché (Cache-Aside).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: proyecto01-restaurante
+data:
+  redis.conf: |
+    # cache puro, sin persistencia
+    save ""
+    appendonly no
+
+    # politica de evicción cuando se llena
+    maxmemory 128mb
+    maxmemory-policy allkeys-lru
+
+    # acepta conexiones desde otros pods del cluster
+    bind 0.0.0.0
+    protected-mode no

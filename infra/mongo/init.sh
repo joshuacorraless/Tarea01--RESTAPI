@@ -28,19 +28,27 @@
 #        kubectl apply -f infra/k8s/mongo/configsvr.yaml
 #        kubectl apply -f infra/k8s/mongo/shards.yaml
 #        kubectl apply -f infra/k8s/mongo/mongos.yaml
-#   2. Esperar a que los 8 pods estén Running:
+#   2. Esperar a que los 10 pods de Mongo (9 mongod + 1 mongos) estén Running:
 #        kubectl get pods -w
 #
 # Uso (desde la raíz del repo):
 #   bash infra/mongo/init.sh
+#
+# Variante para Windows + Docker Desktop (sin dependencia de bash):
+#   .\infra\mongo\init.ps1
+#   (la usa deploy.ps1 internamente)
 # ════════════════════════════════════════════════════════════════════
 
 set -e
 
+# Namespace donde viven los pods del cluster Mongo. Se puede sobreescribir con
+#   NAMESPACE=otro bash infra/mongo/init.sh
+NAMESPACE="${NAMESPACE:-proyecto01-restaurante}"
+
 wait_for_pod() {
   local pod=$1
   echo "  Esperando $pod..."
-  until kubectl exec "$pod" -- mongosh --port 27017 --quiet --eval "db.adminCommand('ping').ok" > /dev/null 2>&1; do
+  until kubectl exec -n "$NAMESPACE" "$pod" -- mongosh --port 27017 --quiet --eval "db.adminCommand('ping').ok" > /dev/null 2>&1; do
     sleep 3
   done
   echo "  ✓ $pod listo"
@@ -54,7 +62,7 @@ verify_mesh() {
   shift
   for target in "$@"; do
     echo "  → $from puede llegar a $target ?"
-    until kubectl exec "$from" -- mongosh --host "$target" --port 27017 --quiet --eval "db.adminCommand('ping').ok" > /dev/null 2>&1; do
+    until kubectl exec -n "$NAMESPACE" "$from" -- mongosh --host "$target" --port 27017 --quiet --eval "db.adminCommand('ping').ok" > /dev/null 2>&1; do
       sleep 2
     done
   done
@@ -77,7 +85,7 @@ echo "═══ [2/5] Inicializando replica sets ═══"
 
 echo "→ csrs (config server) — verificando malla DNS antes de initiate"
 verify_mesh configsvr-0 configsvr-0.configsvr:27017 configsvr-1.configsvr:27017 configsvr-2.configsvr:27017
-kubectl exec configsvr-0 -- mongosh --port 27017 admin --quiet --eval "
+kubectl exec -n "$NAMESPACE" configsvr-0 -- mongosh --port 27017 admin --quiet --eval "
 try {
   rs.initiate({
     _id: 'csrs',
@@ -96,7 +104,7 @@ try {
 
 echo "→ rs0 (shard1) — verificando malla DNS antes de initiate"
 verify_mesh shard1-0 shard1-0.shard1:27017 shard1-1.shard1:27017 shard1-2.shard1:27017
-kubectl exec shard1-0 -- mongosh --port 27017 admin --quiet --eval "
+kubectl exec -n "$NAMESPACE" shard1-0 -- mongosh --port 27017 admin --quiet --eval "
 try {
   rs.initiate({
     _id: 'rs0',
@@ -114,7 +122,7 @@ try {
 
 echo "→ rs1 (shard2) — verificando malla DNS antes de initiate"
 verify_mesh shard2-0 shard2-0.shard2:27017 shard2-1.shard2:27017 shard2-2.shard2:27017
-kubectl exec shard2-0 -- mongosh --port 27017 admin --quiet --eval "
+kubectl exec -n "$NAMESPACE" shard2-0 -- mongosh --port 27017 admin --quiet --eval "
 try {
   rs.initiate({
     _id: 'rs1',
@@ -140,7 +148,7 @@ wait_for_primary() {
   local pod=$1
   local rs=$2
   echo "→ Esperando primario de $rs (en $pod)..."
-  until kubectl exec "$pod" -- mongosh --port 27017 --quiet --eval \
+  until kubectl exec -n "$NAMESPACE" "$pod" -- mongosh --port 27017 --quiet --eval \
     "rs.status().members.some(m => m.stateStr === 'PRIMARY')" 2>/dev/null | grep -q "true"; do
     sleep 3
   done
@@ -151,7 +159,7 @@ wait_for_primary configsvr-0 csrs
 wait_for_primary shard1-0 rs0
 wait_for_primary shard2-0 rs1
 
-MONGOS_POD=$(kubectl get pod -l app=mongos -o jsonpath='{.items[0].metadata.name}')
+MONGOS_POD=$(kubectl get pod -n "$NAMESPACE" -l app=mongos -o jsonpath='{.items[0].metadata.name}')
 echo "Mongos pod: $MONGOS_POD"
 wait_for_pod "$MONGOS_POD"
 
@@ -159,22 +167,55 @@ wait_for_pod "$MONGOS_POD"
 # 4. Registrar shards y habilitar sharding (vía mongos)
 # ────────────────────────────────────────────────────────────────────
 echo ""
-echo "═══ [4/5] Registrando shards y habilitando sharding ═══"
-kubectl exec "$MONGOS_POD" -- mongosh --port 27017 admin --quiet --eval "
-print('→ Registrando rs0 como shard1');
-sh.addShard('rs0/shard1-0.shard1:27017,shard1-1.shard1:27017,shard1-2.shard1:27017');
+echo "═══ [4/5] Registrando shards y habilitando sharding (idempotente) ═══"
+# Cada operacion verifica el estado actual antes de ejecutar. Re-correr el script
+# es seguro: las operaciones ya completadas se saltean en lugar de fallar con
+# "shard already exists" / "sharding already enabled" / "collection already sharded".
+kubectl exec -n "$NAMESPACE" "$MONGOS_POD" -- mongosh --port 27017 admin --quiet --eval "
+function shardExists(name) {
+  try { return db.adminCommand({listShards:1}).shards.some(s => s._id === name); } catch(e) { return false; }
+}
+function shardingEnabled(dbName) {
+  return db.getSiblingDB('config').databases.findOne({_id: dbName}) != null;
+}
+function collectionSharded(coll) {
+  return db.getSiblingDB('config').collections.findOne({_id: coll, dropped: {\$ne: true}}) != null;
+}
 
-print('→ Registrando rs1 como shard2');
-sh.addShard('rs1/shard2-0.shard2:27017,shard2-1.shard2:27017,shard2-2.shard2:27017');
+if (shardExists('rs0')) {
+  print('  rs0 ya estaba registrado, skip');
+} else {
+  print('→ Registrando rs0 como shard1');
+  sh.addShard('rs0/shard1-0.shard1:27017,shard1-1.shard1:27017,shard1-2.shard1:27017');
+}
 
-print('→ Habilitando sharding en restaurant_db (primary shard: rs0)');
-sh.enableSharding('restaurant_db', 'rs0');
+if (shardExists('rs1')) {
+  print('  rs1 ya estaba registrado, skip');
+} else {
+  print('→ Registrando rs1 como shard2');
+  sh.addShard('rs1/shard2-0.shard2:27017,shard2-1.shard2:27017,shard2-2.shard2:27017');
+}
 
-print('→ Sharding menuitems (shard key: menuId hashed)');
-sh.shardCollection('restaurant_db.menuitems', { menuId: 'hashed' });
+if (shardingEnabled('restaurant_db')) {
+  print('  restaurant_db ya tenia sharding habilitado, skip');
+} else {
+  print('→ Habilitando sharding en restaurant_db (primary shard: rs0)');
+  sh.enableSharding('restaurant_db', 'rs0');
+}
 
-print('→ Sharding reservations (shard key: idRestaurante hashed)');
-sh.shardCollection('restaurant_db.reservations', { idRestaurante: 'hashed' });
+if (collectionSharded('restaurant_db.menuitems')) {
+  print('  menuitems ya estaba sharded, skip');
+} else {
+  print('→ Sharding menuitems (shard key: menuId hashed)');
+  sh.shardCollection('restaurant_db.menuitems', { menuId: 'hashed' });
+}
+
+if (collectionSharded('restaurant_db.reservations')) {
+  print('  reservations ya estaba sharded, skip');
+} else {
+  print('→ Sharding reservations (shard key: idRestaurante hashed)');
+  sh.shardCollection('restaurant_db.reservations', { idRestaurante: 'hashed' });
+}
 "
 
 # ────────────────────────────────────────────────────────────────────
@@ -182,7 +223,7 @@ sh.shardCollection('restaurant_db.reservations', { idRestaurante: 'hashed' });
 # ────────────────────────────────────────────────────────────────────
 echo ""
 echo "═══ [5/5] Estado final del sharded cluster ═══"
-kubectl exec "$MONGOS_POD" -- mongosh --port 27017 admin --quiet --eval "
+kubectl exec -n "$NAMESPACE" "$MONGOS_POD" -- mongosh --port 27017 admin --quiet --eval "
 print('--- Shards registrados ---');
 db.adminCommand({ listShards: 1 }).shards.forEach(s => print('  ' + s._id + '  →  ' + s.host));
 print('');

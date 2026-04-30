@@ -3,8 +3,31 @@ import { keycloakConfig } from '../config/keycloak';
 import { dao } from '../dao/DaoFactory';
 import { LoginInput, RegisterInput } from '../schemas/auth.schema';
 
+function splitFullName(fullName: string): { firstName: string; lastName: string } {
+  const nameParts = fullName.trim().split(/\s+/);
+  const firstName = nameParts[0];
+  const lastName = nameParts.slice(1).join(' ') || firstName;
+
+  return { firstName, lastName };
+}
+
 // obtiene un token de admin para llamar a keycloak admin api
 async function getAdminToken(): Promise<string> {
+  if (keycloakConfig.masterAdminUsername && keycloakConfig.masterAdminPassword) {
+    const adminParams = new URLSearchParams({
+      grant_type: 'password',
+      client_id: 'admin-cli',
+      username: keycloakConfig.masterAdminUsername,
+      password: keycloakConfig.masterAdminPassword,
+    });
+
+    const adminResponse = await axios.post(keycloakConfig.masterTokenUrl, adminParams, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+
+    return adminResponse.data.access_token;
+  }
+
   const params = new URLSearchParams({
     grant_type: 'client_credentials',
     client_id: keycloakConfig.adminClientId,
@@ -21,6 +44,7 @@ async function getAdminToken(): Promise<string> {
 // registra un usuario nuevo en keycloak y luego crea el registro local
 export async function registerUser(input: RegisterInput) {
   const adminToken = await getAdminToken();
+  const { firstName, lastName } = splitFullName(input.fullName);
 
   // 1. crear usuario en keycloak
   const createUserResponse = await axios.post(
@@ -28,8 +52,9 @@ export async function registerUser(input: RegisterInput) {
     {
       username: input.email,
       email: input.email,
-      firstName: input.fullName.split(' ')[0],
-      lastName: input.fullName.split(' ').slice(1).join(' ') || '',
+      emailVerified: true,
+      firstName,
+      lastName,
       enabled: true,
       credentials: [
         {
