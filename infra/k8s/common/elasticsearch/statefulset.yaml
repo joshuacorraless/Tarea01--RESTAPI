@@ -9,6 +9,7 @@ metadata:
   name: elasticsearch-service
   namespace: proyecto01-restaurante
 spec:
+  clusterIP: None              # headless — DNS por pod
   selector:
     app: elasticsearch
   ports:
@@ -18,7 +19,6 @@ spec:
     - name: transport
       port: 9300
       targetPort: 9300
-  type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: StatefulSet
