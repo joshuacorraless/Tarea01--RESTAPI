@@ -14,6 +14,10 @@ node_modules/
 **/.env.local
 **/.env.production
 
+# ===== KUBERNETES SECRETS LOCALES =====
+infra/k8s/**/secret.yaml
+infra/k8s/common/keycloak/realm-configmap.yaml
+
 # ===== BUILD =====
 dist/
 dist-ssr/

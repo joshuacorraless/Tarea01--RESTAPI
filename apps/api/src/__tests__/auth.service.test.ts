@@ -102,6 +102,37 @@ describe("registerUser", () => {
     expect(body.lastName).toBe("de los Angeles Mora");
   });
 
+  it("usa el mismo valor como lastName si fullName solo trae una palabra", async () => {
+    mockSuccessfulKeycloakRegistration();
+    (mockedPool.query as jest.Mock).mockResolvedValueOnce({
+      rows: [{ ...dbUserRow, full_name: "Test" }],
+    });
+
+    await registerUser({
+      ...registerInput,
+      fullName: "Test",
+    });
+
+    const keycloakCreateCall = mockedAxios.post.mock.calls[1];
+    const body = keycloakCreateCall[1] as any;
+    expect(body.firstName).toBe("Test");
+    expect(body.lastName).toBe("Test");
+    expect(body.emailVerified).toBe(true);
+  });
+
+  it("marca el email como verificado al crear el usuario en Keycloak", async () => {
+    mockSuccessfulKeycloakRegistration();
+    (mockedPool.query as jest.Mock).mockResolvedValueOnce({
+      rows: [dbUserRow],
+    });
+
+    await registerUser(registerInput);
+
+    const keycloakCreateCall = mockedAxios.post.mock.calls[1];
+    const body = keycloakCreateCall[1] as any;
+    expect(body.emailVerified).toBe(true);
+  });
+
   it("usa null como phone si no se proporciona", async () => {
     mockSuccessfulKeycloakRegistration();
     (mockedPool.query as jest.Mock).mockResolvedValueOnce({

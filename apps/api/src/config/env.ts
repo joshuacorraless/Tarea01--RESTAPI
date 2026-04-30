@@ -13,6 +13,10 @@ const envSchema = z.object({
   KEYCLOAK_CLIENT_SECRET: z.string().min(1),
   KEYCLOAK_ADMIN_CLIENT_ID: z.string().min(1),
   KEYCLOAK_ADMIN_CLIENT_SECRET: z.string().min(1),
+  // opcional: en Kubernetes dev permite usar el admin bootstrap del master realm
+  // para evitar depender del import de roles del service account.
+  KEYCLOAK_MASTER_ADMIN_USERNAME: z.string().optional(),
+  KEYCLOAK_MASTER_ADMIN_PASSWORD: z.string().optional(),
   DB_ENGINE: z.enum(['postgres', 'mongo']).default('postgres'),
   // requerida cuando DB_ENGINE=mongo; ignorada en postgres
   MONGODB_URI: z.string().optional(),

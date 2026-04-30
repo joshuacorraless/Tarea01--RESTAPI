@@ -1,0 +1,41 @@
+# Ingress NGINX que expone la API y el microservicio de búsqueda en localhost.
+#
+# Diseño consciente: NO usamos rewrite-target. Los servicios ya esperan el prefix
+# completo en el lado backend:
+#   - apps/api/src/app.ts:18 → app.use('/api', routes)
+#   - apps/search/src/routes/index.ts:6 → router.use('/search', searchRoutes)
+# Si stripeáramos el prefix con rewrite, los routers de Express no machearían.
+#
+# Sin "host:" → el ingress matchea cualquier hostname, incluso "localhost" puro.
+# Por eso NO hace falta editar C:\Windows\System32\drivers\etc\hosts.
+#
+# Acceso:
+#   curl http://localhost/api/restaurants
+#   curl http://localhost/search/products?q=casado
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: restaurant-ingress
+  namespace: proyecto01-restaurante
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api-service
+                port:
+                  number: 80
+          - path: /search
+            pathType: Prefix
+            backend:
+              service:
+                name: search-service
+                port:
+                  number: 80

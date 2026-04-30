@@ -1,0 +1,99 @@
+# Keycloak 26 en modo "start-dev --import-realm" para que el realm, clients,
+# roles y clients se creen automáticamente al primer arranque.
+#
+# Notas técnicas:
+# - KC_BOOTSTRAP_ADMIN_* reemplaza al viejo KEYCLOAK_ADMIN_* (deprecado en 26).
+# - KC_PROXY_HEADERS=xforwarded reemplaza al viejo KC_PROXY=edge.
+# - KC_HOSTNAME_STRICT=false permite que Keycloak responda a cualquier host;
+#   esto es lo que evita problemas de issuer cuando se accede vía port-forward
+#   (localhost:8080) además de la URL interna del cluster (keycloak-service:8080).
+# - El JWT que recibe la API tiene issuer "http://keycloak-service:8080/realms/restaurant-realm"
+#   porque la API obtiene el token desde adentro del cluster.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: proyecto01-restaurante
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  strategy:
+    type: Recreate           # Keycloak no soporta varias réplicas mientras hace migrations al arrancar
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: quay.io/keycloak/keycloak:26.6.1
+          args:
+            - "start-dev"
+            - "--import-realm"
+          env:
+            - name: KC_DB
+              value: "postgres"
+            - name: KC_DB_URL
+              value: "jdbc:postgresql://keycloak-postgres:5432/keycloak_db"
+            - name: KC_HOSTNAME_STRICT
+              value: "false"
+            - name: KC_HTTP_ENABLED
+              value: "true"
+            - name: KC_PROXY_HEADERS
+              value: "xforwarded"
+          envFrom:
+            - secretRef:
+                name: keycloak-secret
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: realm-import
+              mountPath: /opt/keycloak/data/import
+          readinessProbe:
+            httpGet:
+              path: /realms/restaurant-realm/.well-known/openid-configuration
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /realms/master
+              port: 8080
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+      volumes:
+        - name: realm-import
+          configMap:
+            name: keycloak-realm-import
+            items:
+              - key: restaurant-realm.json
+                path: restaurant-realm-realm.json
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-service
+  namespace: proyecto01-restaurante
+spec:
+  selector:
+    app: keycloak
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http
+  type: ClusterIP

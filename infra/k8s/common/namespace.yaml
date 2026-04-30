@@ -1,0 +1,9 @@
+# Namespace dedicado al proyecto. Todos los manifiestos viven acá.
+# Aplicalo PRIMERO antes que cualquier otro recurso del cluster.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: proyecto01-restaurante
+  labels:
+    name: proyecto01-restaurante
+    project: restaurant-e2
