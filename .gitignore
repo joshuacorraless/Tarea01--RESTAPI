@@ -52,3 +52,10 @@ Thumbs.db
 docs/FUNDAMENTOS-INGENIERILES.md
 GUIA-DEFINITIVA-RESTAURANTES-E2 (4).md
 docs/FUNDAMENTOS-FASE-04-MONGODB.md
+docs/guia-kubernetes-restaurantes-e2.md
+docs/handoff-fase7.md
+docs/fase7-correcciones-cloud.md
+docs/GUIA-LEVANTAR-CLUSTER.md
+
+# Notas locales de aprendizaje (no se versionan)
+docs/_local-notes/

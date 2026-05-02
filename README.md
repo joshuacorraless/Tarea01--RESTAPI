@@ -28,6 +28,8 @@ Este repo tiene dos caminos:
 | Kubernetes | `.\infra\k8s\deploy.ps1 -DbEngine mongo` | Demo de orquestación, sharding, Ingress y escalado horizontal |
 
 La guía completa del modo Kubernetes está en `infra/k8s/README.md`.
+La guía paso a paso para levantar el cluster con MongoDB o PostgreSQL está en
+`docs/GUIA-LEVANTAR-CLUSTER.md`.
 
 ---
 
