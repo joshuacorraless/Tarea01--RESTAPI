@@ -216,8 +216,8 @@ if (shardingEnabled('restaurant_db')) {
 if (collectionSharded('restaurant_db.menuitems')) {
   print('  menuitems ya estaba sharded, skip');
 } else {
-  print('-> Sharding menuitems (shard key: menuId hashed)');
-  sh.shardCollection('restaurant_db.menuitems', { menuId: 'hashed' });
+  print('-> Sharding menuitems (shard key: idMenu hashed)');
+  sh.shardCollection('restaurant_db.menuitems', { idMenu: 'hashed' });
 }
 
 if (collectionSharded('restaurant_db.reservations')) {
