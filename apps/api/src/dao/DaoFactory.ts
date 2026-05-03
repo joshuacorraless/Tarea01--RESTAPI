@@ -15,7 +15,6 @@ export interface DaoRegistry {
   orders: IOrderDao;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 export async function initDaoEngine(): Promise<void> {
   if (env.DB_ENGINE === 'mongo') {
     const { connectMongo } = require('../config/database.mongo');
@@ -26,7 +25,6 @@ export async function initDaoEngine(): Promise<void> {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 export const dao: DaoRegistry = (() => {
   if (env.DB_ENGINE === 'mongo') {
     const { MongoUserDao } = require('./mongo/MongoUserDao');

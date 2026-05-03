@@ -1,7 +1,6 @@
 import swaggerUi from 'swagger-ui-express';
 import { Express } from 'express';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const swaggerDocument = require('./swagger.json');
 
 // configura swagger ui en /api-docs

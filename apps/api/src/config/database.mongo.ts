@@ -9,5 +9,5 @@ export async function connectMongo(): Promise<void> {
     replicaSet: env.MONGO_REPLICA_SET || undefined,
     readPreference: 'primaryPreferred',
   });
-  console.log('conectado a mongodb');
+  console.warn('conectado a mongodb');
 }
