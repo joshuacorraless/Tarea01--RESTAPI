@@ -4,9 +4,9 @@ import { createIndex } from './config/elasticsearch';
 
 async function bootstrap() {
   await createIndex();
-  console.log('ElasticSearch index ready');
 
   app.listen(Number(env.PORT), () => {
+    // eslint-disable-next-line no-console
     console.log(`Search service corriendo en http://localhost:${env.PORT}`);
   });
 }
