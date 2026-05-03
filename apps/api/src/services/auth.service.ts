@@ -109,7 +109,7 @@ export async function registerUser(input: RegisterInput) {
       role: user.role,
       phone: user.phone,
     };
-  } catch (dbError) {
+  } catch {
     await axios.delete(
       `${keycloakConfig.adminBaseUrl}/users/${keycloakUserId}`,
       { headers: { Authorization: `Bearer ${adminToken}` } }

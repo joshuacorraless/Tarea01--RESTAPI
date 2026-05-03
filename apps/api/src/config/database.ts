@@ -13,7 +13,7 @@ pool.on('error', (err) => {
 export async function connectPostgres(): Promise<void> {
   const client = await pool.connect();
   client.release();
-  console.log('conectado a postgresql');
+  console.warn('conectado a postgresql');
 }
 
 export default pool;

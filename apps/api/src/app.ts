@@ -3,7 +3,6 @@ import swaggerUi from 'swagger-ui-express';
 import routes from './routes';
 import { errorHandler } from './middlewares/error.middleware';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const swaggerDocument = require('./docs/swagger.json');
 
 const app = express();

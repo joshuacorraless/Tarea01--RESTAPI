@@ -2,6 +2,22 @@ import { Request, Response } from 'express';
 import * as SearchService from '../services/search.service';
 import { env } from '../config/env';
 
+interface MenuItemResponse {
+  id: string;
+  restaurantId: string;
+  idMenu: string;
+  nombre: string;
+  categoria?: string;
+  detalles?: string;
+  precio: string | number;
+  disponible?: boolean;
+}
+
+interface ApiResponse {
+  success: boolean;
+  data: MenuItemResponse[];
+}
+
 export async function searchByText(req: Request, res: Response) {
   const q = req.query.q as string;
 
@@ -27,16 +43,16 @@ export async function reindex(req: Request, res: Response) {
     return res.status(502).json({ error: 'No se pudo obtener los productos de la API' });
   }
 
-  const data = await response.json() as { success: boolean, data: any[] };
+  const data = await response.json() as ApiResponse;
 
   // Mapear los campos de la BD al formato del documento ES
   const products = data.data.map(item => ({
     id: item.id,
-    restaurantId: item.restaurantId, // viene del JOIN que hace la API
+    restaurantId: item.restaurantId,
     menuId: item.idMenu,
     nombre: item.nombre,
     categoria: item.categoria || 'General',
-    descripcion: item.detalles || 'Producto sin descripción', // detalles → descripcion
+    descripcion: item.detalles || 'Producto sin descripción',
     precio: Number(item.precio),
     disponible: item.disponible ?? true,
   }));

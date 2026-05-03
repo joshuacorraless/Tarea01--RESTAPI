@@ -65,7 +65,8 @@ function Assert-LocalManifest {
 # Devuelve $true si el recurso existe en el namespace.
 function Test-K8sResource {
     param([string]$Kind, [string]$Name, [string]$Ns)
-    $null = kubectl get $Kind $Name -n $Ns 2>$null
+    $local:ErrorActionPreference = 'Continue'
+    $result = kubectl get $Kind $Name -n $Ns 2>&1
     return ($LASTEXITCODE -eq 0)
 }
 
@@ -152,16 +153,21 @@ docker build -t $SearchImage -t restaurant/search:dev (Join-Path $RepoRoot 'apps
 
 # ─── [4/8] Recursos comunes ──────────────────────────────────────────────────
 Write-Step 4 8 "Aplicando recursos comunes (api, search, redis, elasticsearch, keycloak, ingress)"
+
+# Ajustar DB_ENGINE en el configmap.yaml ANTES de aplicarlo
+$configMapPath = Join-Path $CommonDir 'api\configmap.yaml'
+$configMapContent = Get-Content $configMapPath -Raw
+if ($DbEngine -eq 'mongo') {
+    $configMapContent = $configMapContent -replace 'DB_ENGINE: "postgres"', 'DB_ENGINE: "mongo"'
+} else {
+    $configMapContent = $configMapContent -replace 'DB_ENGINE: "mongo"', 'DB_ENGINE: "postgres"'
+}
+$configMapContent | Set-Content $configMapPath -NoNewline
+Write-Host "  DB_ENGINE ajustado a $DbEngine en configmap.yaml"
+
 kubectl apply -f $CommonDir -R
 kubectl set image deployment/api api=$ApiImage -n $Namespace
 kubectl set image deployment/search search=$SearchImage -n $Namespace
-
-# Patch DB_ENGINE en el ConfigMap si es distinto al default ('mongo' en el yaml)
-if ($DbEngine -ne 'mongo') {
-    Write-Host "  Ajustando api-config.DB_ENGINE -> $DbEngine"
-    $patch = '{"data":{"DB_ENGINE":"' + $DbEngine + '"}}'
-    kubectl patch configmap api-config -n $Namespace --type merge -p $patch
-}
 
 # ─── [5/8] Motor de negocio ──────────────────────────────────────────────────
 if ($DbEngine -eq 'mongo') {
@@ -243,7 +249,8 @@ else {
 # ─── [8/8] Reiniciar API y reportar ──────────────────────────────────────────
 Write-Step 8 8 "Reiniciando deployment/api para tomar la configuracion ($DbEngine) y verificando"
 kubectl rollout restart deployment/api -n $Namespace
-kubectl rollout status  deployment/api -n $Namespace --timeout=180s
+kubectl rollout status deployment/api -n $Namespace --timeout=300s
+Start-Sleep -Seconds 5
 
 Write-Host ""
 Write-Host "=================================================================" -ForegroundColor Green

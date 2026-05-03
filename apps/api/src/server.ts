@@ -9,8 +9,10 @@ async function start(): Promise<void> {
   await initDaoEngine();
   await connectRedis();
   app.listen(port, () => {
+    /* eslint-disable no-console */
     console.log(`servidor corriendo en http://localhost:${port}`);
     console.log(`swagger docs en http://localhost:${port}/api-docs`);
+    /* eslint-enable no-console */
   });
 }
 

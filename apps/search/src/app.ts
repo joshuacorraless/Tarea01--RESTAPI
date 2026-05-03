@@ -14,7 +14,7 @@ app.get('/health', (_req, res) => {
 app.use('/', routes);
 
 // error handler global
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: Error, req: express.Request, res: express.Response) => {
   console.error(err);
   res.status(500).json({ error: 'Internal server error', message: err.message });
 });

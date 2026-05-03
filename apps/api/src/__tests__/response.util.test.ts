@@ -76,7 +76,7 @@ describe("sendError", () => {
   });
 
   it("siempre envía data:null en errores", () => {
-    const { res, status, json } = mockRes();
+    const { res, json } = mockRes();
     sendError(res, "forbidden", 403);
 
     expect(json).toHaveBeenCalledWith(expect.objectContaining({ data: null }));
