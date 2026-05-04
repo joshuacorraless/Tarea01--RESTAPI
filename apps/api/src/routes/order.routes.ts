@@ -17,18 +17,16 @@ import {
 
 const router = Router();
 
-router.get("/me", authenticate as any, getMyOrders as any); // ver mis ordenes
+router.get("/me", authenticate as any, getMyOrders as any);
 router.post(
-  // crear una orden
   "/",
   authenticate as any,
   authorize("client", "restaurant_admin") as any,
   validate(createOrderSchema),
   createOrder as any,
 );
-router.get("/:id", authenticate as any, getOrderById as any); // ver una orden especifica
+router.get("/:id", authenticate as any, getOrderById as any);
 router.post(
-  // agregar un item a una orden
   "/:id/items",
   authenticate as any,
   authorize("client", "restaurant_admin") as any,
@@ -36,7 +34,6 @@ router.post(
   addItemToOrder as any,
 );
 router.patch(
-  // actualizar el estado de una orden
   "/:id/status",
   authenticate as any,
   authorize("restaurant_admin") as any,

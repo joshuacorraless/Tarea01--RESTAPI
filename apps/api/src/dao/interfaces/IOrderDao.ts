@@ -33,8 +33,7 @@ export interface OrderRecord {
   items: OrderItemSummary[];
 }
 
-// vista reducida para el listado por cliente
-// coincide con los campos que ya retorna el service actual
+// vista reducida para "mis ordenes"
 export interface OrderSummaryRecord {
   id: string;
   idRestaurante: string;
@@ -44,7 +43,6 @@ export interface OrderSummaryRecord {
   creadoEn: Date;
 }
 
-// estado corto tras cambiar el status; evita devolver toda la orden
 export interface OrderStatusChange {
   id: string;
   estado: EstadoOrden;
@@ -64,13 +62,12 @@ export interface CreateOrderData {
   }>;
 }
 
-// el DAO es dueno de la transaccion para crear y para agregar items
-// porque ambas operaciones requieren mas de un sp dentro de begin/commit
+// la transaccion (begin/commit) la maneja el dao porque crear o agregar items
+// necesita mas de un sp dentro del mismo bloque atomico
 export interface IOrderDao {
   createWithItems(data: CreateOrderData): Promise<OrderRecord>;
   getById(id: string): Promise<OrderRecord | null>;
   getByClient(clientId: string): Promise<OrderSummaryRecord[]>;
-  // devuelve la fila cruda del detalle creado; el service no la mapea hoy
   addItem(orderId: string, input: AddOrderItemInput): Promise<any>;
   updateStatus(id: string, status: EstadoOrden): Promise<OrderStatusChange | null>;
 }

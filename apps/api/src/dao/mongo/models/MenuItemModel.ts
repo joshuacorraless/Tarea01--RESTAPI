@@ -6,7 +6,7 @@ export interface IMenuItem {
   idMenu: string;
   nombre: string;
   detalles: string;
-  // indexado para busqueda por categoria (ElasticSearch fase 5) y shard key candidata
+  // indexada porque la usa el microservicio de busqueda
   categoria: string;
   precio: number;
   imagen: string | null;

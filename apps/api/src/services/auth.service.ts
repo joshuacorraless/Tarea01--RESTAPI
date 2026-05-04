@@ -11,7 +11,6 @@ function splitFullName(fullName: string): { firstName: string; lastName: string 
   return { firstName, lastName };
 }
 
-// obtiene un token de admin para llamar a keycloak admin api
 async function getAdminToken(): Promise<string> {
   if (keycloakConfig.masterAdminUsername && keycloakConfig.masterAdminPassword) {
     const adminParams = new URLSearchParams({
@@ -41,12 +40,10 @@ async function getAdminToken(): Promise<string> {
   return response.data.access_token;
 }
 
-// registra un usuario nuevo en keycloak y luego crea el registro local
 export async function registerUser(input: RegisterInput) {
   const adminToken = await getAdminToken();
   const { firstName, lastName } = splitFullName(input.fullName);
 
-  // 1. crear usuario en keycloak
   const createUserResponse = await axios.post(
     `${keycloakConfig.adminBaseUrl}/users`,
     {
@@ -69,11 +66,10 @@ export async function registerUser(input: RegisterInput) {
     }
   );
 
-  // 2. obtener el id del usuario creado (keycloak lo devuelve en el header location)
+  // keycloak devuelve el id del usuario en el header location
   const locationHeader = createUserResponse.headers.location;
   const keycloakUserId = locationHeader.split('/').pop()!;
 
-  // 3. obtener la representacion del rol del realm
   const rolesResponse = await axios.get(
     `${keycloakConfig.adminBaseUrl}/roles/${input.role}`,
     {
@@ -82,7 +78,6 @@ export async function registerUser(input: RegisterInput) {
   );
   const roleRepresentation = rolesResponse.data;
 
-  // 4. asignar realm role al usuario en keycloak
   await axios.post(
     `${keycloakConfig.adminBaseUrl}/users/${keycloakUserId}/role-mappings/realm`,
     [roleRepresentation],
@@ -91,8 +86,8 @@ export async function registerUser(input: RegisterInput) {
     }
   );
 
-  // 5. crear registro local en postgresql; si falla, rollback del lado de keycloak
-  //    para evitar usuarios huerfanos entre los dos sistemas
+  // si falla el insert local hay que borrar el usuario en keycloak
+  // para no dejar usuarios huerfanos entre los dos sistemas
   try {
     const user = await dao.users.create({
       fullName: input.fullName,
@@ -118,7 +113,6 @@ export async function registerUser(input: RegisterInput) {
   }
 }
 
-// autentica al usuario via keycloak usando resource owner password credentials grant
 export async function loginUser(input: LoginInput) {
   const params = new URLSearchParams({
     grant_type: 'password',

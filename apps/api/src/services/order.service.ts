@@ -12,7 +12,6 @@ export type EstadoOrden =
   | 'entregada'
   | 'cancelada';
 
-// ordenes
 export async function createOrderService(
   input: CreateOrderInput & { idCliente: string },
 ) {

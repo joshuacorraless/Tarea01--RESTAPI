@@ -1,11 +1,10 @@
 import { UpdateUserInput } from '../../schemas/user.schema';
 
-// rol sincronizado con el enum user_role en postgres
+// debe coincidir con el enum user_role en postgres
 export type UserRole = 'client' | 'restaurant_admin';
 
-// representacion en camelcase del registro de users devuelto por los sp
-// se guarda externalAuthId aparte porque los services lo necesitan
-// para validar ownership antes de exponer dtos publicos
+// externalAuthId se guarda aparte porque los services lo usan
+// para validar ownership antes de exponer los dtos publicos
 export interface UserRecord {
   id: string;
   fullName: string;
@@ -25,8 +24,7 @@ export interface CreateUserData {
   phone?: string | null;
 }
 
-// contrato DAO para persistencia de usuarios locales
-// el registro en keycloak vive fuera de este contrato a proposito
+// el registro en keycloak no vive aca a proposito, este dao es solo para la base local
 export interface IUserDao {
   create(data: CreateUserData): Promise<UserRecord>;
   getByExternalId(externalAuthId: string): Promise<UserRecord | null>;

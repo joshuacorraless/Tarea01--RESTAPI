@@ -20,8 +20,7 @@ export interface TableRecord {
   disponible: boolean;
 }
 
-// data de creacion con idClienteUsuario ya resuelto por el service
-// (el service mapea el externalAuthId al id local antes de invocar)
+// el service ya resolvio externalAuthId al id local antes de invocar
 export interface CreateReservationData {
   idRestaurante: string;
   mesaId: string;

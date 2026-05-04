@@ -6,7 +6,6 @@ import { updateUserSchema } from '../schemas/user.schema';
 
 const router = Router();
 
-// todos los endpoints de users requieren autenticacion
 router.use(authenticate as any);
 
 router.get('/me', getMe as any);

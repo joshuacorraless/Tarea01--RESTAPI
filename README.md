@@ -1,319 +1,161 @@
-# Reserva de Restaurantes — Tarea 01 REST API
+<div align="center">
 
-Para el curso de Bases de Datos 2, desarollamos una API REST para la gestión de restaurantes, reservas, menús y pedidos. Construida con Node.js, TypeScript, PostgreSQL y Keycloak como servicio de autenticación.
+# **PROYECTO 01 — RESTAURANTES E2**
 
----
-## Integrantes:
+**REST API distribuida para la gestión de restaurantes, reservas, menús y pedidos**                                                                           
+*Curso de Bases de Datos 2 — Tecnológico de Costa Rica*
 
-- **Joshua Corrales Retana (2024073529)**
-- **Felipe Lepiz Retana (2024800990)**
- ---
-## Requisitos
+![Node](https://img.shields.io/badge/Node.js-20-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Express](https://img.shields.io/badge/Express-5-000000?style=for-the-badge&logo=express&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-7-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis&logoColor=white)
+![Elasticsearch](https://img.shields.io/badge/Elasticsearch-8-005571?style=for-the-badge&logo=elasticsearch&logoColor=white)
+![Keycloak](https://img.shields.io/badge/Keycloak-26-4D4D4D?style=for-the-badge&logo=keycloak&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-1.30-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-blue?style=for-the-badge&logo=docker&logoColor=white)
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) corriendo
-- Kubernetes de Docker Desktop activado si se quiere correr la demo de orquestación
-- `kubectl` en PATH para el despliegue Kubernetes
-- Node.js 20+ (solo para correr las pruebas localmente)
-- npm
+![Coverage](https://img.shields.io/badge/coverage-≥90%25-brightgreen?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-201%20unit%20%2B%20integración-success?style=flat-square)
 
----
-
-## Dos formas de correr el proyecto
-
-Este repo tiene dos caminos:
-
-| Modo | Comando principal | Para qué sirve |
-|------|-------------------|----------------|
-| Docker Compose | `docker compose up -d` | Desarrollo local rápido con API, PostgreSQL y Keycloak |
-| Kubernetes | `.\infra\k8s\deploy.ps1 -DbEngine mongo` | Demo de orquestación, sharding, Ingress y escalado horizontal |
-
-La guía completa del modo Kubernetes está en `infra/k8s/README.md`.
-La guía paso a paso para levantar el cluster con MongoDB o PostgreSQL está en
-`docs/GUIA-LEVANTAR-CLUSTER.md`.
+</div>
 
 ---
 
-## Secrets locales
+## Sobre el proyecto
 
-Los manifests `secret.yaml` de Kubernetes no se versionan. El import local del
-realm de Keycloak tampoco se versiona porque contiene los client secrets. Cada
-máquina debe crearlos localmente copiando las plantillas:
+**Restaurantes E2** es un **sistema backend completo** para administrar restaurantes con su catálogo de menús, mesas, reservas y pedidos. La gracia del proyecto está en que **toda la capa de persistencia es intercambiable**: la misma API puede correr sobre **PostgreSQL** (con stored procedures) o sobre un **cluster sharded de MongoDB** según el valor de la variable `DB_ENGINE`, sin tocar una línea de código de negocio.
+
+Por encima de eso, el sistema agrega:
+
+- **Microservicio de búsqueda** independiente, indexando datos en **Elasticsearch** y visualizables en **Kibana**.
+- **Cache-Aside con Redis** para acelerar lecturas frecuentes.
+- **Autenticación delegada a Keycloak** vía JWT con roles (`client` / `restaurant_admin`).
+- **Despliegue completo en Kubernetes** (Docker Desktop) con NGINX como Ingress y API Gateway.
+- **Pipeline de CI/CD** con GitHub Actions y cobertura mínima del **90 %**.
+
+> El objetivo académico es demostrar **abstracción del motor de base de datos**, **sharding + replicación**, **balanceo de carga** y **separación de microservicios** en un mismo dominio de negocio.
+
+---
+
+## Integrantes
+
+| Nombre | Carné |
+|---|---|
+| **Joshua Corrales Retana** | `2024073529` |
+| **Felipe Lepiz Retana** | `2024800990` |
+
+---
+
+## Stack tecnológico
+
+| Capa | Tecnología |
+|---|---|
+| **Runtime** | Node.js 20 + TypeScript |
+| **Framework HTTP** | Express 5 |
+| **Persistencia** | PostgreSQL 16 **o** MongoDB 7 sharded — seleccionable con `DB_ENGINE` |
+| **Cache** | Redis (patrón Cache-Aside) |
+| **Búsqueda** | Elasticsearch + Kibana (microservicio dedicado) |
+| **Autenticación** | Keycloak 26 (JWT con JWKS) |
+| **Orquestación** | Kubernetes (Docker Desktop) + NGINX Ingress |
+| **CI/CD** | GitHub Actions |
+
+---
+
+## Cómo levantar el proyecto
+
+> **Guía oficial paso a paso** en
+> [`Guia para correr proyecto y verificar funcionalidad.md`](./Guia%20para%20correr%20proyecto%20y%20verificar%20funcionalidad.md).
+> Cubre el ciclo completo: levantar el cluster, cargar datos con el seed,
+> indexar en Elasticsearch, probar endpoints y bajar todo.
+
+**Resumen rápido** (desde la raíz del repo):
 
 ```powershell
-Copy-Item infra\k8s\common\api\secret.example.yaml infra\k8s\common\api\secret.yaml
-Copy-Item infra\k8s\common\keycloak\secret.example.yaml infra\k8s\common\keycloak\secret.yaml
-Copy-Item infra\k8s\common\keycloak\realm-configmap.example.yaml infra\k8s\common\keycloak\realm-configmap.yaml
-Copy-Item infra\k8s\postgres\secret.example.yaml infra\k8s\postgres\secret.yaml
-```
-
-Para la demo local, los valores de `KEYCLOAK_CLIENT_SECRET` y
-`KEYCLOAK_ADMIN_CLIENT_SECRET` deben coincidir con los secrets declarados en
-`infra/k8s/common/keycloak/realm-configmap.yaml`.
-
----
-
-## Levantar el proyecto
-
-### Opción A: Docker Compose
-
-```bash
-docker compose up -d
-```
-
-Esto levanta tres contenedores:
-
-| Contenedor | URL | Descripción |
-|------------|-----|-------------|
-| API | `http://localhost:3000` | La REST API |
-| Keycloak | `http://localhost:8080` | Servidor de autenticación |
-| PostgreSQL | `localhost:5433` | Base de datos |
-
-El esquema de la base de datos y los datos iniciales se crean automáticamente la primera vez.
-
-> Espera 30-60 segundos después del `docker compose up` antes de hacer requests. Keycloak tarda en iniciar.
-
-Para detener todo:
-
-```bash
-docker compose down
-```
-
-Para detener y borrar los volúmenes (reset completo de la base de datos):
-
-```bash
-docker compose down -v
-```
-
-### Opción B: Kubernetes en Docker Desktop
-
-Primero instalá el NGINX Ingress Controller una vez por máquina, como se
-explica en `infra/k8s/README.md`. Luego:
-
-```powershell
+# 1. Levantar el cluster con MongoDB sharded
 .\infra\k8s\deploy.ps1 -DbEngine mongo
+
+# 2. Cargar datos generados por LLM (Gemini)
+node database/seeds/generate-seeds.js
+
+# 3. Indexar en Elasticsearch
+curl.exe -X POST http://localhost/search/reindex
+
+# 4. Probar
+curl.exe http://localhost/api/restaurants
 ```
 
-En modo Kubernetes la API queda expuesta por Ingress en:
-
-```text
-http://localhost/api/...
-http://localhost/search/...
-```
-
-Para limpiar el namespace completo:
-
-```powershell
-.\infra\k8s\destroy.ps1
-```
+Para **bajar el cluster**: `.\infra\k8s\destroy.ps1`
 
 ---
 
-## Configuración de Keycloak (primer uso)
 
-Keycloak es el servicio que maneja autenticación y tokens JWT.
+## Endpoints
 
-En **Docker Compose**, la configuración puede hacerse manualmente con los pasos
-de esta sección.
+**Documentación interactiva en Swagger:**
 
-En **Kubernetes**, el realm, clients, roles y service account se importan
-automáticamente desde `infra/k8s/common/keycloak/realm-configmap.yaml`; no hay
-que hacer estos pasos a mano.
+- **Kubernetes:** `http://localhost/api-docs`
+- **Docker Compose:** `http://localhost:3000/api-docs`
 
-### 1. Entrar al admin console
-
-Abrir `http://localhost:8080`, click en **Administration Console** e ingresar con:
-- **Usuario:** `admin`
-- **Contraseña:** `admin`
-
-### 2. Crear el realm
-
-Un realm es el espacio de trabajo aislado de Keycloak para este proyecto.
-
-1. En la esquina superior izquierda, donde dice **master**, click
-2. Click en **Create realm**
-3. **Realm name:** `restaurant-realm`
-4. Click en **Create**
-
-### 3. Crear los roles
-
-1. En el menú lateral, click en **Realm roles**
-2. Click en **Create role** → nombre: `client` → **Save**
-3. Repetir y crear el rol `restaurant_admin`
-
-### 4. Crear el client `restaurant-api`
-
-1. Menú lateral → **Clients** → **Create client**
-2. **Client type:** `OpenID Connect` | **Client ID:** `restaurant-api` → **Next**
-3. Activar **Client authentication: ON**
-4. En Authentication flow, marcar:
-   - [x] Standard flow
-   - [x] Direct access grants ← obligatorio para login por password
-5. **Next** → **Valid redirect URIs:** `*` → **Save**
-6. Ir a la pestaña **Credentials** y copiar el **Client secret**
-7. Pegar ese valor en el `.env` como `KEYCLOAK_CLIENT_SECRET`
-
-### 5. Configurar `admin-cli`
-
-La API necesita poder crear usuarios en Keycloak cuando alguien se registra. Para eso usamos `admin-cli`.
-
-1. **Clients** → buscar y abrir `admin-cli`
-2. Pestaña **Settings:**
-   - **Client authentication:** `ON`
-   - **Service accounts roles:** `ON`
-   - **Save**
-3. Pestaña **Credentials** → copiar el **Client secret**
-4. Pegar ese valor en el `.env` como `KEYCLOAK_ADMIN_CLIENT_SECRET`
-5. Pestaña **Service account roles** → **Assign role**
-6. En el filtro, cambiar a **"Filter by clients"** → buscar `realm-management`
-7. Asignar estos 4 roles:
-   - [x] `manage-users`
-   - [x] `view-users`
-   - [x] `manage-realm`
-   - [x] `view-realm`
-8. Click en **Assign**
-
-### 6. Actualizar el `.env` y reiniciar
-
-```env
-PORT=3000
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=restaurant_db
-KC_ADMIN_USERNAME=admin
-KC_ADMIN_PASSWORD=admin
-DATABASE_URL=postgresql://postgres:postgres@postgres:5432/restaurant_db
-KEYCLOAK_BASE_URL=http://keycloak:8080
-KEYCLOAK_REALM=restaurant-realm
-KEYCLOAK_CLIENT_ID=restaurant-api
-KEYCLOAK_CLIENT_SECRET=<secret del paso 4>
-KEYCLOAK_ADMIN_CLIENT_ID=admin-cli
-KEYCLOAK_ADMIN_CLIENT_SECRET=<secret del paso 5>
-```
-
-Después de actualizar el `.env`:
-
-```bash
-docker compose down
-docker compose up -d
-```
-
----
-
-## Cómo funciona la autenticación
-
-```
-Registro:
-  POST /api/auth/register  →  API crea usuario en Keycloak  →  API guarda registro en PostgreSQL
-
-Login:
-  POST /api/auth/login  →  API pide token a Keycloak  →  devuelve accessToken + refreshToken al cliente
-
-Requests protegidas:
-  Authorization: Bearer <accessToken>  →  API valida el JWT contra Keycloak JWKS  →  ejecuta la lógica
-```
-
-El `accessToken` tiene una duración de 5 minutos. Cada usuario tiene un rol: `client` o `restaurant_admin`, que determina a qué endpoints puede acceder.
-
----
-
-## Endpoints disponibles
-
-La documentación interactiva y completa de la API la podemos encontrar en Swagger:
-
-```
-Docker Compose: http://localhost:3000/api-docs
-Kubernetes:     http://localhost/api-docs
-```
-
-Resumen de rutas:
+### Tabla resumen
 
 | Método | Ruta | Rol requerido | Descripción |
-|--------|------|---------------|-------------|
-| GET | `/health` | — | Health check |
-| POST | `/api/auth/register` | — | Registrar usuario |
-| POST | `/api/auth/login` | — | Login, devuelve tokens |
-| GET | `/api/users/me` | cualquiera | Ver mi perfil |
-| PUT | `/api/users/:id` | propio | Actualizar mi perfil |
-| DELETE | `/api/users/:id` | propio | Eliminar mi cuenta |
-| GET | `/api/restaurants` | — | Listar restaurantes |
-| POST | `/api/restaurants` | restaurant_admin | Crear restaurante |
-| POST | `/api/menus` | restaurant_admin | Crear menú |
-| GET | `/api/menus/:id` | cualquiera | Ver un menú |
-| PUT | `/api/menus/:id` | restaurant_admin | Actualizar menú |
-| DELETE | `/api/menus/:id` | restaurant_admin | Eliminar menú |
-| POST | `/api/menus/:id/items` | restaurant_admin | Agregar ítem al menú |
-| GET | `/api/menus/:id/items` | cualquiera | Ver ítems de un menú |
-| GET | `/api/reservations/available-tables` | client | Consultar mesas disponibles |
-| POST | `/api/reservations` | client | Crear reserva |
-| GET | `/api/reservations/my` | client | Ver mis reservas |
-| GET | `/api/reservations/:id` | client | Ver una reserva |
-| PATCH | `/api/reservations/:id/cancel` | client | Cancelar reserva |
-| POST | `/api/orders` | client | Crear pedido |
-| GET | `/api/orders/:id` | client | Ver un pedido |
-| GET | `/api/orders/my` | client | Ver mis pedidos |
-| POST | `/api/orders/:id/items` | client | Agregar ítem al pedido |
-| PATCH | `/api/orders/:id/status` | restaurant_admin | Actualizar estado del pedido |
+|:------:|------|:------:|-------------|
+| `GET`    | `/health` | — | Health check |
+| `POST`   | `/api/auth/register` | — | **Registrar usuario** |
+| `POST`   | `/api/auth/login` | — | **Login** (devuelve tokens) |
+| `GET`    | `/api/users/me` | autenticado | Mi perfil |
+| `PUT`    | `/api/users/:id` | propio | Actualizar perfil |
+| `DELETE` | `/api/users/:id` | propio | Eliminar mi cuenta |
+| `GET`    | `/api/restaurants` | — | Listar restaurantes |
+| `POST`   | `/api/restaurants` | `restaurant_admin` | Crear restaurante |
+| `GET`    | `/api/menus/:id` | — | Ver menú |
+| `POST`   | `/api/menus` | `restaurant_admin` | Crear menú |
+| `PUT`    | `/api/menus/:id` | `restaurant_admin` | Actualizar menú |
+| `DELETE` | `/api/menus/:id` | `restaurant_admin` | Eliminar menú |
+| `GET`    | `/api/menus/:id/items` | — | Ítems del menú |
+| `POST`   | `/api/menus/:id/items` | `restaurant_admin` | Crear ítem |
+| `GET`    | `/api/reservations/available-tables` | — | Mesas disponibles |
+| `POST`   | `/api/reservations` | `client` | Crear reserva |
+| `GET`    | `/api/reservations/me` | `client` | Mis reservas |
+| `DELETE` | `/api/reservations/:id` | `client` | Cancelar reserva |
+| `POST`   | `/api/orders` | `client` | Crear pedido |
+| `GET`    | `/api/orders/:id` | autenticado | Ver pedido |
+| `POST`   | `/api/orders/:id/items` | `client` | Agregar ítem al pedido |
+| `PATCH`  | `/api/orders/:id/status` | `restaurant_admin` | Cambiar estado |
+| `GET`    | `/search/products?q=...` | — | **Búsqueda full-text** |
+| `GET`    | `/search/products/category/:categoria` | — | Búsqueda por categoría |
+| `POST`   | `/search/reindex` | — | Reindexar Elasticsearch |
 
 ---
 
-## Flujo de uso típico
-
-```
-1. Registrar un cliente             POST /api/auth/register  { role: "client" }
-2. Registrar un admin de restaurante POST /api/auth/register  { role: "restaurant_admin" }
-3. Login con cada usuario           POST /api/auth/login
-4. El admin crea un restaurante     POST /api/restaurants
-5. El admin crea un menú            POST /api/menus
-6. El admin agrega ítems al menú    POST /api/menus/:id/items
-7. El cliente consulta mesas        GET  /api/reservations/available-tables?restaurantId=...&reservadoPara=...
-8. El cliente crea una reserva      POST /api/reservations
-9. El cliente crea un pedido        POST /api/orders  { idReserva: ... }
-10. El cliente agrega ítems          POST /api/orders/:id/items
-11. El admin actualiza el estado     PATCH /api/orders/:id/status
-```
-
----
-
-## Pruebas unitarias
-
-Las pruebas cubren controladores, servicios y utilidades. Están en `src/__tests__/` y se ejecutan con Jest sin necesidad de Docker ni base de datos real (todo está simulado con mocks).
+## Pruebas
 
 ```bash
-# Correr todas las pruebas unitarias
-npm test
-
-# Ver reporte de cobertura en la terminal
-npm run test:coverage
-
-# Modo watch (re-corre las pruebas al guardar archivos)
-npm run test:watch
+cd apps/api
+npm test                 # unitarias + integración
+npm run test:coverage    # con reporte de cobertura
 ```
 
-El proyecto exige mínimo **90% de cobertura de líneas**. Si algún archivo baja de ese umbral, el comando termina con error.
-
-El reporte de cobertura en HTML se genera en `coverage/lcov-report/index.html` — se debe abrir en el navegador para ver qué líneas de cada archivo fueron o no ejecutadas por las pruebas.
+> **Cobertura mínima exigida:** `90 %` de líneas.
+> Reporte HTML en [`apps/api/coverage/lcov-report/index.html`](./apps/api/coverage/lcov-report/index.html).
 
 ---
 
-## Estructura del proyecto
+## Documentación adicional
 
-```
-src/
-├── config/          # Conexión a base de datos, variables de entorno, Keycloak
-├── controllers/     # Reciben el request HTTP y delegan al servicio correspondiente
-├── middlewares/     # Autenticación JWT, autorización por rol, validación de schemas
-├── routes/          # Definición de rutas y qué middleware aplica a cada una
-├── schemas/         # Validaciones de entrada con Zod
-├── services/        # Lógica de negocio, llaman a los stored procedures de PostgreSQL
-├── utils/           # Helpers de respuesta (sendSuccess / sendError)
-└── __tests__/       # Pruebas unitarias de todas las capas
+| Documento | Descripción |
+|---|---|
+| [**Guía oficial paso a paso**](./Guia%20para%20correr%20proyecto%20y%20verificar%20funcionalidad.md) | Flujo completo de levantamiento y verificación |
+| [**Despliegue en Kubernetes**](./infra/k8s/README.md) | Manifiestos, topología y scripts de deploy |
+| [**Seeds con Gemini**](./database/seeds/README.md) | Generación de datos de prueba con LLM |
+| [**Architecture Decision Records**](./docs/adr/README.md) | Decisiones técnicas documentadas |
 
-database/
-├── init.sql              # Esquema completo de la base de datos
-├── stored-procedures.sql # Todos los stored procedures
-└── crearMesas.sql        # Seed: 10 mesas por restaurante
+---
 
-docs/
-├── swagger.json          # Especificación OpenAPI
-└── postman-collection.json
-```
+<div align="center">
+
+**Tecnológico de Costa Rica** — *Bases de Datos 2* — *2026*
+
+</div>

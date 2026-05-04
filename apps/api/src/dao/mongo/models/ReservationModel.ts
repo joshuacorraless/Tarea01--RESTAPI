@@ -3,7 +3,7 @@ import mongoose, { HydratedDocument, Schema } from 'mongoose';
 
 export interface IReservation {
   _id: string;
-  // shard key candidata: la mayoria de accesos son por restaurante
+  // shard key: la mayoria de queries filtran por restaurante
   idRestaurante: string;
   mesaId: string;
   idClienteUsuario: string;

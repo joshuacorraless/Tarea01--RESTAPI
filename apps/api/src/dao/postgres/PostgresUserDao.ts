@@ -6,8 +6,7 @@ import {
   UserRecord,
 } from '../interfaces/IUserDao';
 
-// mapea la fila en snake_case devuelta por los sp a la forma camelcase del dominio
-// se mantiene aqui para no acoplar los services al esquema fisico
+// los sp devuelven snake_case y los services trabajan en camelcase
 function mapUser(row: any): UserRecord {
   return {
     id: row.id,

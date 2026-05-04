@@ -7,7 +7,6 @@ export async function register(req: Request, res: Response): Promise<void> {
     const user = await registerUser(req.body);
     sendSuccess(res, user, 'user registered successfully', 201);
   } catch (error: any) {
-    // keycloak devuelve 409 si el usuario ya existe
     if (error.response?.status === 409) {
       sendError(res, 'user with this email already exists', 409);
       return;
@@ -21,7 +20,6 @@ export async function login(req: Request, res: Response): Promise<void> {
     const tokens = await loginUser(req.body);
     sendSuccess(res, tokens, 'login successful');
   } catch (error: any) {
-    // keycloak devuelve 401 si las credenciales son invalidas
     if (error.response?.status === 401) {
       sendError(res, 'invalid email or password', 401);
       return;

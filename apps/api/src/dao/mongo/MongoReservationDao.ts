@@ -31,8 +31,7 @@ export class MongoReservationDao implements IReservationDao {
   ): Promise<TableRecord[]> {
     const endTime = new Date(reservadoPara.getTime() + duracion * 60 * 1000);
 
-    // IDs de mesas que tienen reservas que solapan con la ventana solicitada.
-    // Dos intervalos se solapan cuando: inicio1 < fin2 AND inicio2 < fin1
+    // dos intervalos se solapan si: inicio1 < fin2 AND inicio2 < fin1
     const busyTableIds = await ReservationModel.distinct('mesaId', {
       idRestaurante: restaurantId,
       estado: { $in: ['pendiente', 'confirmada'] },

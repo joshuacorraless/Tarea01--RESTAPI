@@ -20,7 +20,6 @@ import { invalidateCache } from '../middlewares/cache.middleware';
 export async function createMenu(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     const menu = await createMenuService(req.body);
-    // invalidar el listado de menus del restaurante afectado
     await invalidateCache(`cache:/api/menus/restaurant/${req.body.idRestaurante}`);
     sendSuccess(res, menu, 'menu creado exitosamente', 201);
   } catch (error: any) {
@@ -57,7 +56,7 @@ export async function updateMenu(req: AuthenticatedRequest, res: Response): Prom
       sendError(res, 'menu no encontrado', 404);
       return;
     }
-    // invalidar el menu especifico y todos los listados de restaurante (no sabemos a cual pertenece el menu)
+    // wildcard porque no sabemos a que restaurante pertenece este menu
     await invalidateCache(
       `cache:/api/menus/${req.params.id}`,
       'cache:/api/menus/restaurant/*',

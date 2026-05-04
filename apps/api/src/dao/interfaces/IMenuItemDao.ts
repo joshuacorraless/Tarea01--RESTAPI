@@ -9,7 +9,7 @@ export interface MenuItemRecord {
   restaurantId?: string;
   nombre: string;
   detalles: string;
-  // categoria es requerido por el microservicio de busqueda; se indexa en bd
+  // categoria va indexada porque la usa el microservicio de busqueda
   categoria: string;
   precio: number;
   imagen: string | null;

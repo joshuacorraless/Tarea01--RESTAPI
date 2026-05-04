@@ -13,7 +13,7 @@ function mapMenuItem(row: any): MenuItemRecord {
     nombre: row.nombre,
     detalles: row.detalles,
     categoria: row.categoria,
-    // precio viene como string desde pg por ser NUMERIC; se normaliza a number
+    // pg devuelve NUMERIC como string, lo casteamos a number
     precio: Number(row.precio),
     imagen: row.imagen,
     disponible: row.disponible,

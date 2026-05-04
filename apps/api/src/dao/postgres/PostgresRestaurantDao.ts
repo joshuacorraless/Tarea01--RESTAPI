@@ -19,8 +19,7 @@ function mapRestaurant(row: any): RestaurantRecord {
   };
 }
 
-// el sp del listado incluye join con users para traer nombre/email del admin
-// por eso tiene mapper propio en vez de reutilizar mapRestaurant
+// mapper aparte porque el listado trae join con users (nombre/email del admin)
 function mapRestaurantWithAdmin(row: any): RestaurantWithAdminRecord {
   return {
     id: row.id,

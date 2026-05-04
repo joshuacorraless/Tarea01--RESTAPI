@@ -7,21 +7,17 @@ const swaggerDocument = require('./docs/swagger.json');
 
 const app = express();
 
-// middleware global para parsear json
 app.use(express.json());
 
-// documentacion swagger en /api-docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// rutas bajo prefijo /api
 app.use('/api', routes);
 
-// health check simple
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
-// error handler global (debe ir despues de las rutas)
+// el error handler global tiene que ir al final
 app.use(errorHandler);
 
 export default app;

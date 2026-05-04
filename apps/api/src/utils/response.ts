@@ -1,6 +1,5 @@
 import { Response } from 'express';
 
-// estructura estandar de respuesta para toda la api
 interface ApiResponse<T = unknown> {
   success: boolean;
   message: string;

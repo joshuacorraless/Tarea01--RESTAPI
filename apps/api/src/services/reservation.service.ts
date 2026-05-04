@@ -1,7 +1,6 @@
 import { dao } from '../dao/DaoFactory';
 import { CreateReservationInput } from '../schemas/menu-reservation-order.schema';
 
-// reservas
 export async function getAvailableTablesService(
   restaurantId: string,
   reservadoPara: Date,
@@ -13,7 +12,7 @@ export async function getAvailableTablesService(
 export async function createReservationService(
   input: CreateReservationInput & { idCliente: string },
 ) {
-  // mapear externalAuthId (sub de keycloak) al id local antes de crear la reserva
+  // el sub del jwt es el externalAuthId, lo mapeamos al id local antes de crear
   const clientUser = await dao.users.getByExternalId(input.idCliente);
   if (!clientUser) {
     throw new Error('Usuario cliente no encontrado');

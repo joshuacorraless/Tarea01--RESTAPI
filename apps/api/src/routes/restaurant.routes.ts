@@ -8,7 +8,6 @@ import { cacheMiddleware } from '../middlewares/cache.middleware';
 
 const router = Router();
 
-// get es publico con cache de 2 minutos; post requiere autenticacion + rol restaurant_admin
 router.get('/', cacheMiddleware(120) as any, list);
 router.post(
   '/',

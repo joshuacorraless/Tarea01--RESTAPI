@@ -11,7 +11,7 @@ export async function createIndex() {
 
   await esClient.indices.create({
     index: INDEX,
-    // mappings es como un "create table" en SQL
+    // los mappings son el equivalente a un CREATE TABLE
     mappings: {
       properties: {
         id: { type: "keyword" },

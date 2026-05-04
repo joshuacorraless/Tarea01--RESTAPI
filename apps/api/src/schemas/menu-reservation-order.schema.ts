@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// menu
 export const createMenuSchema = z.object({
   idRestaurante: z.string().uuid(),
   nombre: z.string().min(1).max(200),
@@ -17,7 +16,6 @@ export const updateMenuSchema = z.object({
 export type CreateMenuInput = z.infer<typeof createMenuSchema>;
 export type UpdateMenuInput = z.infer<typeof updateMenuSchema>;
 
-// menu item
 export const createMenuItemSchema = z.object({
   nombre: z.string().min(1).max(200),
   detalles: z.string().min(1).max(1000),
@@ -39,7 +37,6 @@ export const updateMenuItemSchema = z.object({
 export type CreateMenuItemInput = z.infer<typeof createMenuItemSchema>;
 export type UpdateMenuItemInput = z.infer<typeof updateMenuItemSchema>;
 
-// reservas
 export const createReservationSchema = z.object({
   idRestaurante: z.string().uuid(),
   mesaId: z.string().uuid(),
@@ -51,7 +48,6 @@ export const createReservationSchema = z.object({
 
 export type CreateReservationInput = z.infer<typeof createReservationSchema>;
 
-// pedidos
 const orderItemSchema = z.object({
   idItemMenu: z.string().uuid(),
   cantidad: z.number().int().positive(),

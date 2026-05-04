@@ -36,7 +36,7 @@ export async function searchByCategory(req: Request, res: Response) {
 }
 
 export async function reindex(req: Request, res: Response) {
-  // Pedirle a la API principal todos los ítems de menú
+  // pedimos a la api principal todos los items de menu
   const response = await fetch(`${env.API_INTERNAL_URL}/api/menus/items/all`);
 
   if (!response.ok) {
@@ -45,7 +45,7 @@ export async function reindex(req: Request, res: Response) {
 
   const data = await response.json() as ApiResponse;
 
-  // Mapear los campos de la BD al formato del documento ES
+  // adaptamos los campos al formato del documento de elasticsearch
   const products = data.data.map(item => ({
     id: item.id,
     restaurantId: item.restaurantId,

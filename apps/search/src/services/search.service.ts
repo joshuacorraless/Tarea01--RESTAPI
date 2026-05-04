@@ -15,7 +15,8 @@ export async function searchByText(query: string): Promise<ProductDocument[]> {
   const result = await esClient.search<ProductDocument>({
     index: INDEX,
     query: {
-      multi_match: { // * multi_match busca varios campos a la vez
+      // multi_match busca el query en varios campos a la vez
+      multi_match: {
         query,
         fields: ['nombre^3', 'categoria^2', 'descripcion'],
       },
@@ -50,7 +51,8 @@ export async function reindex(products: ProductDocument[]): Promise<{ indexed: n
     },
   ]);
 
-  const result = await esClient.bulk({ operations, refresh: true }); // * envia todo de golpe, mas eficiente
+  // bulk manda todo de un solo viaje, evita N requests a ES
+  const result = await esClient.bulk({ operations, refresh: true });
 
   if (result.errors) {
     const failed = result.items.filter(i => i.index?.error);

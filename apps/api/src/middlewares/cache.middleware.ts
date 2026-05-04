@@ -1,15 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { getRedisClient } from '../config/redis';
 
-/**
- * Middleware Cache-Aside: consulta Redis antes de llegar al controlador.
- * Si hay hit devuelve la respuesta cacheada; si hay miss intercepta res.json
- * para guardar la respuesta fresca en Redis con el TTL indicado.
- */
+// cache-aside: si hay hit devuelve lo cacheado; si hay miss guarda la respuesta fresca con el ttl dado
 export function cacheMiddleware(ttlSeconds: number) {
   return async (req: Request, res: Response, next: NextFunction) => {
     const redis = getRedisClient();
-    if (!redis) return next(); // Redis no disponible → continuar sin cache
+    if (!redis) return next();
 
     const key = `cache:${req.originalUrl}`;
 
@@ -20,13 +16,12 @@ export function cacheMiddleware(ttlSeconds: number) {
         return res.json(JSON.parse(cached));
       }
     } catch {
-      return next(); // error de Redis → servir sin cache, no romper el request
+      // si redis falla seguimos sin cache, no rompemos el request
+      return next();
     }
 
-    // interceptar res.json para cachear la respuesta antes de enviarla
     const originalJson = res.json.bind(res);
     res.json = (body) => {
-      // solo cachear respuestas exitosas (2xx)
       if (res.statusCode < 400) {
         redis.setEx(key, ttlSeconds, JSON.stringify(body)).catch(() => {});
       }
@@ -38,11 +33,7 @@ export function cacheMiddleware(ttlSeconds: number) {
   };
 }
 
-/**
- * Elimina claves de Redis que coincidan con los patrones dados.
- * Acepta wildcards de Redis: ej. "cache:/api/menus/restaurant/*"
- * Llamar despues de cualquier operacion de escritura (POST, PUT, DELETE).
- */
+// se llama despues de cualquier escritura para que el cache no quede desactualizado
 export async function invalidateCache(...patterns: string[]): Promise<void> {
   const redis = getRedisClient();
   if (!redis) return;
@@ -52,7 +43,7 @@ export async function invalidateCache(...patterns: string[]): Promise<void> {
       const keys = await redis.keys(pattern);
       if (keys.length > 0) await redis.del(keys);
     } catch {
-      // fallo silencioso — la invalidacion no es critica para el flujo principal
+      // si falla la invalidacion no rompemos el flujo principal
     }
   }
 }

@@ -1,9 +1,7 @@
 import { dao } from '../dao/DaoFactory';
 import { CreateRestaurantInput } from '../schemas/restaurant.schema';
 
-// crea un restaurante vinculado al admin autenticado
 export async function createRestaurant(adminExternalId: string, input: CreateRestaurantInput) {
-  // resolver el id local del admin antes de persistir el restaurante
   const adminUser = await dao.users.getByExternalId(adminExternalId);
 
   if (!adminUser) {
@@ -27,7 +25,6 @@ export async function createRestaurant(adminExternalId: string, input: CreateRes
   };
 }
 
-// lista todos los restaurantes activos (no eliminados) con info del admin
 export async function listRestaurants() {
   const restaurants = await dao.restaurants.list();
 

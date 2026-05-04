@@ -12,8 +12,7 @@ export interface RestaurantRecord {
   updatedAt?: Date;
 }
 
-// variante del listado que ya incluye el join con la info publica del admin
-// se separa del create porque sp_create_restaurant no retorna admin_name/email
+// el listado incluye join con users; el create no lo trae, por eso son tipos separados
 export interface RestaurantWithAdminRecord extends RestaurantRecord {
   updatedAt: Date;
   adminUser: {

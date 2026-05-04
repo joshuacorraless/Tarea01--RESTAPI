@@ -2,7 +2,7 @@ import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from './auth.middleware';
 import { sendError } from '../utils/response';
 
-// middleware de autorizacion por rol - se usa despues de authenticate
+// se aplica despues de authenticate
 export function authorize(...allowedRoles: string[]) {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {

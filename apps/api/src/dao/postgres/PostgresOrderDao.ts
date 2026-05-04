@@ -25,7 +25,6 @@ function mapOrder(row: any): OrderRecord {
   };
 }
 
-// listado liviano para "mis ordenes"; no trae detalles ni reserva
 function mapOrderSummary(row: any): OrderSummaryRecord {
   return {
     id: row.id,
@@ -39,8 +38,7 @@ function mapOrderSummary(row: any): OrderSummaryRecord {
 
 export class PostgresOrderDao implements IOrderDao {
   async createWithItems(data: CreateOrderData): Promise<OrderRecord> {
-    // la transaccion vive en el DAO: varios sp deben ser atomicos
-    // (crear orden, agregar items, recalcular total)
+    // crear orden + items + recalcular total tiene que ser atomico
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
@@ -98,7 +96,7 @@ export class PostgresOrderDao implements IOrderDao {
   }
 
   async addItem(orderId: string, input: AddOrderItemInput): Promise<any> {
-    // agregar un item tambien es transaccional porque debe recalcular el total
+    // tambien transaccional porque agregar item recalcula el total
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
@@ -111,8 +109,6 @@ export class PostgresOrderDao implements IOrderDao {
       await client.query('SELECT sp_recalculate_order_total($1)', [orderId]);
 
       await client.query('COMMIT');
-      // retorno crudo: el service actual no mapea el detalle y tests dependen
-      // de la forma directa del sp
       return itemResult.rows[0];
     } catch (err) {
       await client.query('ROLLBACK');

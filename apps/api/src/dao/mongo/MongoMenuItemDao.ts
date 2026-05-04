@@ -45,7 +45,7 @@ export class MongoMenuItemDao implements IMenuItemDao {
   async findAll(): Promise<MenuItemRecord[]> {
     const docs = await MenuItemModel.aggregate([
       { $match: { deletedAt: null } },
-      // join con menus para obtener restaurantId
+      // hacemos lookup a menus para sacar el restaurantId
       {
         $lookup: {
           from: "menus",
