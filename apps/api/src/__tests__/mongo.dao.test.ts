@@ -421,7 +421,8 @@ describe('MongoReservationDao', () => {
     expect(await dao.getAvailableTables('rest-1', NOW, 90)).toEqual([]);
   });
 
-  it('create retorna reserva mapeada', async () => {
+  it('create retorna reserva mapeada cuando no hay conflicto', async () => {
+    (mReservation.findOne as jest.Mock).mockResolvedValueOnce(null);
     (mReservation.create as jest.Mock).mockResolvedValueOnce(reservationDoc);
     const result = await dao.create({
       idRestaurante: 'rest-1',
@@ -432,6 +433,20 @@ describe('MongoReservationDao', () => {
     });
     expect(result.id).toBe('res-1');
     expect(result.estado).toBe('pendiente');
+  });
+
+  it('create lanza error si la mesa ya esta reservada en ese horario', async () => {
+    (mReservation.findOne as jest.Mock).mockResolvedValueOnce(reservationDoc);
+    await expect(
+      dao.create({
+        idRestaurante: 'rest-1',
+        mesaId: 'table-1',
+        idClienteUsuario: 'user-2',
+        tamannoReserva: 2,
+        reservadoPara: NOW,
+      }),
+    ).rejects.toThrow('mesa no disponible para el horario solicitado');
+    expect(mReservation.create).not.toHaveBeenCalled();
   });
 
   it('getById retorna reserva si existe', async () => {

@@ -65,13 +65,40 @@ export class MongoReservationDao implements IReservationDao {
   }
 
   async create(data: CreateReservationData): Promise<ReservationRecord> {
+    const duracion = data.duracionReserva ?? 90;
+    const endTime = new Date(data.reservadoPara.getTime() + duracion * 60 * 1000);
+
+    // mismo criterio de solapamiento que getAvailableTables, pero acotado a la
+    // mesa solicitada. Postgres lo hace dentro de sp_create_reservation.
+    const conflict = await ReservationModel.findOne({
+      idRestaurante: data.idRestaurante,
+      mesaId: data.mesaId,
+      estado: { $in: ['pendiente', 'confirmada'] },
+      deletedAt: null,
+      $expr: {
+        $and: [
+          { $lt: ['$reservadoPara', endTime] },
+          {
+            $gt: [
+              { $add: ['$reservadoPara', { $multiply: ['$duracionReserva', 60000] }] },
+              data.reservadoPara,
+            ],
+          },
+        ],
+      },
+    });
+
+    if (conflict) {
+      throw new Error('mesa no disponible para el horario solicitado');
+    }
+
     const doc = await ReservationModel.create({
       idRestaurante: data.idRestaurante,
       mesaId: data.mesaId,
       idClienteUsuario: data.idClienteUsuario,
       tamannoReserva: data.tamannoReserva,
       reservadoPara: data.reservadoPara,
-      duracionReserva: data.duracionReserva ?? 90,
+      duracionReserva: duracion,
       notas: data.notas ?? null,
     });
     return mapReservation(doc);

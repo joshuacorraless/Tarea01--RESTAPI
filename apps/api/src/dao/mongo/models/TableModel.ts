@@ -9,13 +9,18 @@ export interface ITable {
   disponible: boolean;
 }
 
-const tableSchema = new Schema<ITable>({
-  _id: { type: String, default: () => randomUUID() },
-  idRestaurante: { type: String, required: true, index: true },
-  numeroMesa: { type: Schema.Types.Mixed, required: true },
-  capacidad: { type: Number, required: true },
-  disponible: { type: Boolean, default: true },
-});
+// los seeds y el resto del repo (init.ps1, ADR-003) usan la coleccion `mesas`,
+// por defecto Mongoose pluralizaria 'Table' a 'tables' y no encontraria nada.
+const tableSchema = new Schema<ITable>(
+  {
+    _id: { type: String, default: () => randomUUID() },
+    idRestaurante: { type: String, required: true, index: true },
+    numeroMesa: { type: Schema.Types.Mixed, required: true },
+    capacidad: { type: Number, required: true },
+    disponible: { type: Boolean, default: true },
+  },
+  { collection: 'mesas' },
+);
 
 export type TableDocument = HydratedDocument<ITable>;
 export const TableModel = mongoose.model<ITable>('Table', tableSchema);

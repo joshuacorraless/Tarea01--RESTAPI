@@ -46,7 +46,10 @@ export async function createReservation(
     });
     sendSuccess(res, reservation, "Reserva creada exitosamente", 201);
   } catch (error: any) {
-    if (error.message?.includes("no encontrado")) {
+    if (
+      error.message?.includes("no encontrado") ||
+      error.message?.includes("no disponible")
+    ) {
       sendError(res, error.message, 409);
       return;
     }
