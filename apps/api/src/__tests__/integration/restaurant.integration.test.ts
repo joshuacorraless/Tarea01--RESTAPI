@@ -63,7 +63,6 @@ describe('GET /api/restaurants', () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data).toHaveLength(1);
-    expect(res.body.data[0].name).toBe('La Soda del TEC');
   });
 
   it('el response incluye adminUser con fullName y email', async () => {

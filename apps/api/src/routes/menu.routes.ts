@@ -26,6 +26,7 @@ const router = Router();
 
 // rutas fijas antes de las que tienen /:param
 router.get("/restaurant/:restaurantId", cacheMiddleware(120) as any, getMenusByRestaurant);
+router.get('/items/all', getAllMenuItems);
 router.post(
   "/",
   authenticate as any,
@@ -50,10 +51,7 @@ router.delete(
 );
 
 // items del menu
-router.get('/items/all', getAllMenuItems);
 router.get("/:menuId/items", cacheMiddleware(60) as any, getMenuItems);
-
-
 router.post(
   "/:menuId/items",
   authenticate as any,
