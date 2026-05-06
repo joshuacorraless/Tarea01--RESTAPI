@@ -127,9 +127,16 @@ export class MongoReservationDao implements IReservationDao {
   }
 
   async cancel(id: string, clientId: string): Promise<ReservationRecord | null> {
+    // idRestaurante es la shard key; sin ella mongos abanica findAndModify a
+    // todos los shards y MongoDB rechaza la operacion. Hacemos un read primero
+    // (los reads sharded sí pueden hacer fan-out) para resolverla.
+    const existing = await ReservationModel.findOne({ _id: id, deletedAt: null });
+    if (!existing) return null;
+
     const doc = await ReservationModel.findOneAndUpdate(
       {
         _id: id,
+        idRestaurante: existing.idRestaurante,
         idClienteUsuario: clientId,
         estado: { $nin: ['cancelada', 'completada'] },
         deletedAt: null,

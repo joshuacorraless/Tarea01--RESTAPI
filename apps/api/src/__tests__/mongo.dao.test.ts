@@ -469,16 +469,35 @@ describe('MongoReservationDao', () => {
     expect(await dao.getByRestaurant('rest-1')).toHaveLength(2);
   });
 
-  it('cancel retorna reserva cancelada', async () => {
+  it('cancel retorna reserva cancelada e incluye idRestaurante (shard key) en el filtro', async () => {
     const cancelled = { ...reservationDoc, estado: 'cancelada' as const };
+    (mReservation.findOne as jest.Mock).mockResolvedValueOnce(reservationDoc);
     (mReservation.findOneAndUpdate as jest.Mock).mockResolvedValueOnce(cancelled);
+
     const result = await dao.cancel('res-1', 'user-1');
+
     expect(result?.estado).toBe('cancelada');
+    expect(mReservation.findOneAndUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        _id: 'res-1',
+        idRestaurante: 'rest-1',
+        idClienteUsuario: 'user-1',
+      }),
+      { $set: { estado: 'cancelada' } },
+      { new: true },
+    );
   });
 
-  it('cancel retorna null si reserva no existe o ya cancelada', async () => {
-    (mReservation.findOneAndUpdate as jest.Mock).mockResolvedValueOnce(null);
+  it('cancel retorna null si la reserva no existe (sin segunda query)', async () => {
+    (mReservation.findOne as jest.Mock).mockResolvedValueOnce(null);
     expect(await dao.cancel('x', 'user-1')).toBeNull();
+    expect(mReservation.findOneAndUpdate).not.toHaveBeenCalled();
+  });
+
+  it('cancel retorna null si la reserva existe pero ya esta cancelada', async () => {
+    (mReservation.findOne as jest.Mock).mockResolvedValueOnce(reservationDoc);
+    (mReservation.findOneAndUpdate as jest.Mock).mockResolvedValueOnce(null);
+    expect(await dao.cancel('res-1', 'user-1')).toBeNull();
   });
 });
 
