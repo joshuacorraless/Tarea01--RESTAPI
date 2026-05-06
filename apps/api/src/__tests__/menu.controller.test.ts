@@ -302,10 +302,13 @@ describe("Menu Controller", () => {
       );
 
       await updateMenuItem(
-        mockReq({ params: { itemId: "i-1" }, body: { name: "Tacos updated" } }),
+        mockReq({ params: { menuId: "m-1", itemId: "i-1" }, body: { name: "Tacos updated" } }),
         mockRes(),
       );
 
+      expect(menuService.updateMenuItemService).toHaveBeenCalledWith("m-1", "i-1", {
+        name: "Tacos updated",
+      });
       expect(response.sendSuccess).toHaveBeenCalledWith(
         expect.anything(),
         updated,
@@ -316,7 +319,7 @@ describe("Menu Controller", () => {
     it("responde 404 si el item no existe", async () => {
       (menuService.updateMenuItemService as jest.Mock).mockResolvedValue(null);
 
-      await updateMenuItem(mockReq({ params: { itemId: "99" } }), mockRes());
+      await updateMenuItem(mockReq({ params: { menuId: "m-1", itemId: "99" } }), mockRes());
 
       expect(response.sendError).toHaveBeenCalledWith(
         expect.anything(),
@@ -330,7 +333,7 @@ describe("Menu Controller", () => {
         new Error("DB error"),
       );
 
-      await updateMenuItem(mockReq({ params: { itemId: "i-1" } }), mockRes());
+      await updateMenuItem(mockReq({ params: { menuId: "m-1", itemId: "i-1" } }), mockRes());
 
       expect(response.sendError).toHaveBeenCalledWith(
         expect.anything(),
@@ -347,9 +350,9 @@ describe("Menu Controller", () => {
         undefined,
       );
 
-      await deleteMenuItem(mockReq({ params: { itemId: "i-1" } }), mockRes());
+      await deleteMenuItem(mockReq({ params: { menuId: "m-1", itemId: "i-1" } }), mockRes());
 
-      expect(menuService.deleteMenuItemService).toHaveBeenCalledWith("i-1");
+      expect(menuService.deleteMenuItemService).toHaveBeenCalledWith("m-1", "i-1");
       expect(response.sendSuccess).toHaveBeenCalledWith(
         expect.anything(),
         null,
@@ -362,7 +365,7 @@ describe("Menu Controller", () => {
         new Error("DB error"),
       );
 
-      await deleteMenuItem(mockReq({ params: { itemId: "i-1" } }), mockRes());
+      await deleteMenuItem(mockReq({ params: { menuId: "m-1", itemId: "i-1" } }), mockRes());
 
       expect(response.sendError).toHaveBeenCalledWith(
         expect.anything(),

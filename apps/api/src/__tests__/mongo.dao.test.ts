@@ -368,19 +368,29 @@ describe('MongoMenuItemDao', () => {
   it('update retorna item actualizado', async () => {
     const updated = { ...menuItemDoc, precio: 3000 };
     (mMenuItem.findOneAndUpdate as jest.Mock).mockResolvedValueOnce(updated);
-    expect((await dao.update('item-1', { precio: 3000 }))?.precio).toBe(3000);
+    expect((await dao.update('menu-1', 'item-1', { precio: 3000 }))?.precio).toBe(3000);
+  });
+
+  it('update incluye idMenu (shard key) en el filtro', async () => {
+    (mMenuItem.findOneAndUpdate as jest.Mock).mockResolvedValueOnce(menuItemDoc);
+    await dao.update('menu-1', 'item-1', { precio: 3000 });
+    expect(mMenuItem.findOneAndUpdate).toHaveBeenCalledWith(
+      { _id: 'item-1', idMenu: 'menu-1', deletedAt: null },
+      { $set: { precio: 3000 } },
+      { new: true },
+    );
   });
 
   it('update retorna null si item no existe', async () => {
     (mMenuItem.findOneAndUpdate as jest.Mock).mockResolvedValueOnce(null);
-    expect(await dao.update('x', {})).toBeNull();
+    expect(await dao.update('menu-1', 'x', {})).toBeNull();
   });
 
-  it('softDelete llama findOneAndUpdate con deletedAt', async () => {
+  it('softDelete llama findOneAndUpdate con deletedAt e idMenu (shard key)', async () => {
     (mMenuItem.findOneAndUpdate as jest.Mock).mockResolvedValueOnce(menuItemDoc);
-    await dao.softDelete('item-1');
+    await dao.softDelete('menu-1', 'item-1');
     expect(mMenuItem.findOneAndUpdate).toHaveBeenCalledWith(
-      { _id: 'item-1', deletedAt: null },
+      { _id: 'item-1', idMenu: 'menu-1', deletedAt: null },
       { $set: { deletedAt: expect.any(Date) } },
     );
   });

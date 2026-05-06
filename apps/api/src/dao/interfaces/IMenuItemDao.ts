@@ -22,6 +22,6 @@ export interface IMenuItemDao {
   create(menuId: string, input: CreateMenuItemInput): Promise<MenuItemRecord>;
   getByMenu(menuId: string): Promise<MenuItemRecord[]>;
   findAll(): Promise<MenuItemRecord[]>;
-  update(itemId: string, input: UpdateMenuItemInput): Promise<MenuItemRecord | null>;
-  softDelete(itemId: string): Promise<void>;
+  update(menuId: string, itemId: string, input: UpdateMenuItemInput): Promise<MenuItemRecord | null>;
+  softDelete(menuId: string, itemId: string): Promise<void>;
 }

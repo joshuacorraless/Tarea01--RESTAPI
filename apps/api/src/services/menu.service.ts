@@ -43,10 +43,10 @@ export async function getAllMenuItemsService(): Promise<MenuItemRecord[]> {
   return dao.menuItems.findAll();
 }
 
-export async function updateMenuItemService(itemId: string, input: UpdateMenuItemInput) {
-  return dao.menuItems.update(itemId, input);
+export async function updateMenuItemService(menuId: string, itemId: string, input: UpdateMenuItemInput) {
+  return dao.menuItems.update(menuId, itemId, input);
 }
 
-export async function deleteMenuItemService(itemId: string): Promise<void> {
-  await dao.menuItems.softDelete(itemId);
+export async function deleteMenuItemService(menuId: string, itemId: string): Promise<void> {
+  await dao.menuItems.softDelete(menuId, itemId);
 }

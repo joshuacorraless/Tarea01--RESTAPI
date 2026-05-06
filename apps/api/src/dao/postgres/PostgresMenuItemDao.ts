@@ -55,6 +55,7 @@ export class PostgresMenuItemDao implements IMenuItemDao {
   }
 
   async update(
+    _menuId: string,
     itemId: string,
     input: UpdateMenuItemInput,
   ): Promise<MenuItemRecord | null> {
@@ -74,7 +75,7 @@ export class PostgresMenuItemDao implements IMenuItemDao {
     return mapMenuItem(result.rows[0]);
   }
 
-  async softDelete(itemId: string): Promise<void> {
+  async softDelete(_menuId: string, itemId: string): Promise<void> {
     await pool.query("SELECT sp_delete_menu_item($1)", [itemId]);
   }
 }

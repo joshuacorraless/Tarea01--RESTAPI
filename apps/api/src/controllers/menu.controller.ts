@@ -113,7 +113,7 @@ export async function getAllMenuItems(req: AuthenticatedRequest, res: Response):
 
 export async function updateMenuItem(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
-    const item = await updateMenuItemService(req.params.itemId, req.body);
+    const item = await updateMenuItemService(req.params.menuId, req.params.itemId, req.body);
     if (!item) {
       sendError(res, 'item del menu no encontrado', 404);
       return;
@@ -127,7 +127,7 @@ export async function updateMenuItem(req: AuthenticatedRequest, res: Response): 
 
 export async function deleteMenuItem(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
-    await deleteMenuItemService(req.params.itemId);
+    await deleteMenuItemService(req.params.menuId, req.params.itemId);
     await invalidateCache(`cache:/api/menus/${req.params.menuId}/items`);
     sendSuccess(res, null, 'item del menu eliminado exitosamente');
   } catch (error: any) {

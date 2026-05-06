@@ -196,7 +196,7 @@ describe("getMenuItemsService", () => {
 describe("updateMenuItemService", () => {
   it("actualiza y retorna el item", async () => {
     (mockedPool.query as jest.Mock).mockResolvedValueOnce({ rows: [itemRow] });
-    expect(await updateMenuItemService("i1", { precio: 3000 })).toEqual(
+    expect(await updateMenuItemService("1", "i1", { precio: 3000 })).toEqual(
       mappedItem,
     );
   });
@@ -204,7 +204,7 @@ describe("updateMenuItemService", () => {
   it("retorna null si el item no existe", async () => {
     (mockedPool.query as jest.Mock).mockResolvedValueOnce({ rows: [] });
     expect(
-      await updateMenuItemService("i999", {} as UpdateMenuItemInput),
+      await updateMenuItemService("1", "i999", {} as UpdateMenuItemInput),
     ).toBeNull();
   });
 });
@@ -212,7 +212,7 @@ describe("updateMenuItemService", () => {
 describe("deleteMenuItemService", () => {
   it("llama al stored procedure con el id correcto", async () => {
     (mockedPool.query as jest.Mock).mockResolvedValueOnce({ rows: [] });
-    await deleteMenuItemService("i1");
+    await deleteMenuItemService("1", "i1");
     expect(mockedPool.query).toHaveBeenCalledWith(
       "SELECT sp_delete_menu_item($1)",
       ["i1"],

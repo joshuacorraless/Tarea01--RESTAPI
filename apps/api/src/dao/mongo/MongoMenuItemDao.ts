@@ -89,6 +89,7 @@ export class MongoMenuItemDao implements IMenuItemDao {
   }
 
   async update(
+    menuId: string,
     itemId: string,
     input: UpdateMenuItemInput,
   ): Promise<MenuItemRecord | null> {
@@ -100,8 +101,10 @@ export class MongoMenuItemDao implements IMenuItemDao {
     if (input.imagen !== undefined) updates.imagen = input.imagen ?? null;
     if (input.disponible !== undefined) updates.disponible = input.disponible;
 
+    // idMenu es la shard key (hashed); incluirlo en el filtro permite que
+    // mongos enrute findAndModify a un solo shard.
     const doc = await MenuItemModel.findOneAndUpdate(
-      { _id: itemId, deletedAt: null },
+      { _id: itemId, idMenu: menuId, deletedAt: null },
       { $set: updates },
       { new: true },
     );
@@ -109,9 +112,9 @@ export class MongoMenuItemDao implements IMenuItemDao {
     return mapMenuItem(doc);
   }
 
-  async softDelete(itemId: string): Promise<void> {
+  async softDelete(menuId: string, itemId: string): Promise<void> {
     await MenuItemModel.findOneAndUpdate(
-      { _id: itemId, deletedAt: null },
+      { _id: itemId, idMenu: menuId, deletedAt: null },
       { $set: { deletedAt: new Date() } },
     );
   }
