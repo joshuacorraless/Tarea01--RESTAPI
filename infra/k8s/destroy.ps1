@@ -1,21 +1,5 @@
 #requires -Version 5.1
-<#
-.SYNOPSIS
-    Limpia el deploy de Fase 7 borrando el namespace completo.
 
-.DESCRIPTION
-    Borrar el namespace elimina TODO en cascada: pods, services, configmaps,
-    secrets, statefulsets, deployments, PVCs y PV asociados. El Ingress
-    Controller (en namespace ingress-nginx) NO se toca: pertenece al cluster,
-    no a este proyecto.
-
-.PARAMETER Force
-    Saltea la confirmacion interactiva.
-
-.EXAMPLE
-    .\infra\k8s\destroy.ps1
-    .\infra\k8s\destroy.ps1 -Force
-#>
 [CmdletBinding()]
 param(
     [switch]$Force

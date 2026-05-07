@@ -1,43 +1,5 @@
 #requires -Version 5.1
-<#
-.SYNOPSIS
-    Inicializa el sharded cluster de MongoDB en Kubernetes (variante PowerShell).
 
-.DESCRIPTION
-    Equivalente directo de infra/mongo/init.sh, pensado para Windows + Docker
-    Desktop sin depender de bash/Git Bash/WSL. Es invocado por deploy.ps1
-    cuando DB_ENGINE=mongo, despues del rollout de los StatefulSets de mongod.
-
-    Topologia que arma este script:
-
-      ┌────────────────────────────────────────────────────────────┐
-      │                  Docker Desktop K8s                         │
-      │                                                              │
-      │   [mongos]  ──────────────► [csrs] (config server RS)       │
-      │      │                       configsvr-0 (P), -1, -2         │
-      │      │                                                       │
-      │      ├──► [rs0 / shard1]  shard1-0 (P), shard1-1, shard1-2  │
-      │      │                                                       │
-      │      └──► [rs1 / shard2]  shard2-0 (P), shard2-1, shard2-2  │
-      │                                                              │
-      │   Total: 10 pods (9 mongod + 1 mongos)                       │
-      └────────────────────────────────────────────────────────────┘
-
-    Distribucion de datos:
-      - menuitems     -> SHARDED entre rs0 y rs1 (shard key: menuId hashed)
-      - reservations  -> SHARDED entre rs0 y rs1 (shard key: idRestaurante hashed)
-      - users, restaurants, menus, orders, mesas -> solo en rs0 (primary shard)
-
-    Idempotente: re-correr el script es seguro. Las funciones shardExists,
-    shardingEnabled y collectionSharded skippean operaciones ya hechas.
-
-.PARAMETER Namespace
-    Namespace de Kubernetes donde viven los pods. Default: proyecto01-restaurante.
-
-.EXAMPLE
-    .\infra\mongo\init.ps1
-    .\infra\mongo\init.ps1 -Namespace otro-ns
-#>
 [CmdletBinding()]
 param(
     [string]$Namespace = $(if ($env:NAMESPACE) { $env:NAMESPACE } else { 'proyecto01-restaurante' })
@@ -89,7 +51,7 @@ function Invoke-Mongo {
     if ($LASTEXITCODE -ne 0) { throw "mongosh fallo en $Pod (exit $LASTEXITCODE)" }
 }
 
-# ─── [1/5] Esperar que todos los pods de mongod respondan ────────────────────
+# [1/5] Esperar que todos los pods de mongod respondan
 Write-Host ""
 Write-Host "=== [1/5] Esperando que los 9 pods de mongod respondan ==="
 $mongodPods = @(
@@ -99,7 +61,7 @@ $mongodPods = @(
 )
 foreach ($p in $mongodPods) { Wait-Pod $p }
 
-# ─── [2/5] Inicializar los 3 replica sets ────────────────────────────────────
+# [2/5] Inicializar los 3 replica sets 
 Write-Host ""
 Write-Host "=== [2/5] Inicializando replica sets ==="
 
@@ -164,7 +126,7 @@ Write-Host "-> rs1 (shard2) - verificando malla DNS antes de initiate"
 Wait-DnsMesh -From 'shard2-0' -Targets @('shard2-0.shard2:27017','shard2-1.shard2:27017','shard2-2.shard2:27017')
 Invoke-Mongo -Pod 'shard2-0' -Script $initRs1
 
-# ─── [3/5] Esperar eleccion de primarios y mongos listo ──────────────────────
+# [3/5] Esperar eleccion de primarios y mongos listo 
 Write-Host ""
 Write-Host "=== [3/5] Esperando eleccion de primarios ==="
 
@@ -177,7 +139,7 @@ if ([string]::IsNullOrWhiteSpace($mongosPod)) { throw "No se encontro pod con la
 Write-Host "Mongos pod: $mongosPod"
 Wait-Pod $mongosPod
 
-# ─── [4/5] Registrar shards y habilitar sharding (idempotente) ───────────────
+# [4/5] Registrar shards y habilitar sharding (idempotente)
 Write-Host ""
 Write-Host "=== [4/5] Registrando shards y habilitando sharding (idempotente) ==="
 
@@ -230,7 +192,7 @@ if (collectionSharded('restaurant_db.reservations')) {
 
 Invoke-Mongo -Pod $mongosPod -Script $shardingScript
 
-# ─── [5/5] Reporte final ─────────────────────────────────────────────────────
+# [5/5] Reporte final
 Write-Host ""
 Write-Host "=== [5/5] Estado final del sharded cluster ==="
 

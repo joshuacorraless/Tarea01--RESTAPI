@@ -1,7 +1,5 @@
 # Elasticsearch single-node para la demo (igual que en compose.yaml).
 # StatefulSet en lugar de Deployment porque ES escribe a disco y queremos PVC estable.
-# Para una demo de un solo pod, podría ser Deployment, pero StatefulSet es más
-# fiel al patrón productivo y deja la puerta abierta a multi-node después.
 ---
 apiVersion: v1
 kind: Service

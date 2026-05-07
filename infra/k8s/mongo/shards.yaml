@@ -2,7 +2,7 @@
 # Cada shard es un replica set independiente de 3 pods.
 # Las colecciones sharded (menuitems, reservations) se distribuyen entre AMBOS.
 # Las colecciones no-sharded (users, restaurants, menus, orders, mesas) viven en rs0
-# (designado como primary shard de la BD restaurant_db por el script init.sh).
+# (designado como primary shard de la BD restaurant_db por el script init).
 ---
 # ──────────────────────────────────────
 # Shard 1 — rs0 (3 pods: 1 primary + 2 secondary)

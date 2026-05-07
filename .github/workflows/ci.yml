@@ -40,7 +40,7 @@ jobs:
 
   # Microservicio de search
   # Job separado e independiente: corre en paralelo con test-api.
-  # Si uno falla, el otro sigue corriendo. GitHub te muestra ambos resultados.
+  # Si uno falla, el otro sigue corriendo. GitHub muestra ambos resultados.
   # Tiene su propio cache-dependency-path apuntando al package-lock del search.
   test-search:
     runs-on: ubuntu-latest

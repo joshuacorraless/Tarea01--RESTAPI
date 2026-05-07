@@ -2,10 +2,6 @@
 // genera datos de prueba con la api de gemini e inserta en postgres o mongo
 // segun DB_ENGINE.
 //
-// requiere GEMINI_API_KEY en el .env de la raiz.
-// uso desde la raiz del proyecto:
-//   node database/seeds/generate-seeds.js
-//   DB_ENGINE=mongo node database/seeds/generate-seeds.js
 
 const { execSync } = require("child_process");
 const fs = require("fs");
@@ -131,7 +127,6 @@ async function generateWithGemini() {
     throw new Error("Gemini no devolvio contenido. Revisa tu API key.");
   }
 
-  // a veces gemini envuelve el json en ```json ... ``` aunque le pidas que no
   const cleaned = rawText
     .replace(/^```json\s*/i, "")
     .replace(/\s*```$/, "")
