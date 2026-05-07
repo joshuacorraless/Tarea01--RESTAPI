@@ -11,6 +11,7 @@ import { authenticate } from "../middlewares/auth.middleware";
 import { authorize } from "../middlewares/role.middleware";
 import { validate } from "../middlewares/validate.middleware";
 import { createReservationSchema } from "../schemas/menu-reservation-order.schema";
+import { sensitiveLimiter } from "../middlewares/rateLimit.middleware";
 
 const router = Router();
 
@@ -24,6 +25,7 @@ router.get(
 );
 router.post(
   "/",
+  sensitiveLimiter,
   authenticate as any,
   authorize("client", "restaurant_admin") as any,
   validate(createReservationSchema),
@@ -32,6 +34,7 @@ router.post(
 router.get("/:id", authenticate as any, getReservationById as any);
 router.delete(
   "/:id",
+  sensitiveLimiter,
   authenticate as any,
   authorize("client", "restaurant_admin") as any,
   cancelReservation as any,

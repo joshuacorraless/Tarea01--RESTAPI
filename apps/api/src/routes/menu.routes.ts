@@ -21,6 +21,7 @@ import {
   updateMenuItemSchema,
 } from "../schemas/menu-reservation-order.schema";
 import { cacheMiddleware } from "../middlewares/cache.middleware";
+import { sensitiveLimiter } from "../middlewares/rateLimit.middleware";
 
 const router = Router();
 
@@ -29,6 +30,7 @@ router.get("/restaurant/:restaurantId", cacheMiddleware(120) as any, getMenusByR
 router.get('/items/all', getAllMenuItems);
 router.post(
   "/",
+  sensitiveLimiter,
   authenticate as any,
   authorize("restaurant_admin") as any,
   validate(createMenuSchema),
@@ -38,6 +40,7 @@ router.post(
 router.get("/:id", cacheMiddleware(120) as any, getMenuById);
 router.put(
   "/:id",
+  sensitiveLimiter,
   authenticate as any,
   authorize("restaurant_admin") as any,
   validate(updateMenuSchema),
@@ -45,6 +48,7 @@ router.put(
 );
 router.delete(
   "/:id",
+  sensitiveLimiter,
   authenticate as any,
   authorize("restaurant_admin") as any,
   deleteMenu as any,
@@ -54,6 +58,7 @@ router.delete(
 router.get("/:menuId/items", cacheMiddleware(60) as any, getMenuItems);
 router.post(
   "/:menuId/items",
+  sensitiveLimiter,
   authenticate as any,
   authorize("restaurant_admin") as any,
   validate(createMenuItemSchema),
@@ -61,6 +66,7 @@ router.post(
 );
 router.put(
   "/:menuId/items/:itemId",
+  sensitiveLimiter,
   authenticate as any,
   authorize("restaurant_admin") as any,
   validate(updateMenuItemSchema),
@@ -68,6 +74,7 @@ router.put(
 );
 router.delete(
   "/:menuId/items/:itemId",
+  sensitiveLimiter,
   authenticate as any,
   authorize("restaurant_admin") as any,
   deleteMenuItem as any,

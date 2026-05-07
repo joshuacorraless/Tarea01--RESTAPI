@@ -14,12 +14,14 @@ import {
   addOrderItemSchema,
   updateOrderStatusSchema,
 } from "../schemas/menu-reservation-order.schema";
+import { sensitiveLimiter } from "../middlewares/rateLimit.middleware";
 
 const router = Router();
 
 router.get("/me", authenticate as any, getMyOrders as any);
 router.post(
   "/",
+  sensitiveLimiter,
   authenticate as any,
   authorize("client", "restaurant_admin") as any,
   validate(createOrderSchema),
@@ -28,6 +30,7 @@ router.post(
 router.get("/:id", authenticate as any, getOrderById as any);
 router.post(
   "/:id/items",
+  sensitiveLimiter,
   authenticate as any,
   authorize("client", "restaurant_admin") as any,
   validate(addOrderItemSchema),
@@ -35,6 +38,7 @@ router.post(
 );
 router.patch(
   "/:id/status",
+  sensitiveLimiter,
   authenticate as any,
   authorize("restaurant_admin") as any,
   validate(updateOrderStatusSchema),
