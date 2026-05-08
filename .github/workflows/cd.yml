@@ -7,6 +7,10 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write 
+
     steps:
       - uses: actions/checkout@v4
 
@@ -18,7 +22,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push API image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./apps/api
           push: true
@@ -27,7 +31,7 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/api:${{ github.sha }}
 
       - name: Build and push Search image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./apps/search
           push: true
