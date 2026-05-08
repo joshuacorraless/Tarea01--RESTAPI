@@ -1,4 +1,61 @@
-node_modules/
-dist/
-.env
 CLAUDE.md
+guia.md
+
+# ===== DEPENDENCIAS =====
+node_modules/
+**/node_modules/
+
+# ===== VARIABLES DE ENTORNO =====
+.env
+.env.local
+.env.production
+.env.development
+**/.env
+**/.env.local
+**/.env.production
+
+# ===== KUBERNETES SECRETS LOCALES =====
+infra/k8s/**/secret.yaml
+infra/k8s/common/keycloak/realm-configmap.yaml
+
+# ===== BUILD =====
+dist/
+dist-ssr/
+**/dist/
+
+# ===== COVERAGE =====
+coverage/
+**/coverage/
+
+# ===== LOGS =====
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ===== UPLOADS =====
+uploads/
+**/uploads/
+
+# ===== EDITOR / SO =====
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.sw?
+
+#==== DOCS =====
+docs/FUNDAMENTOS-INGENIERILES.md
+GUIA-DEFINITIVA-RESTAURANTES-E2 (4).md
+docs/FUNDAMENTOS-FASE-04-MONGODB.md
+docs/guia-kubernetes-restaurantes-e2.md
+docs/handoff-fase7.md
+docs/fase7-correcciones-cloud.md
+docs/GUIA-LEVANTAR-CLUSTER.md
+
+# Notas locales de aprendizaje (no se versionan)
+docs/_local-notes/

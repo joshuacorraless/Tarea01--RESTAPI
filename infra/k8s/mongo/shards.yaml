@@ -1,0 +1,143 @@
+# Shard 1 (replica set rs0) y Shard 2 (replica set rs1).
+# Cada shard es un replica set independiente de 3 pods.
+# Las colecciones sharded (menuitems, reservations) se distribuyen entre AMBOS.
+# Las colecciones no-sharded (users, restaurants, menus, orders, mesas) viven en rs0
+# (designado como primary shard de la BD restaurant_db por el script init).
+---
+# ──────────────────────────────────────
+# Shard 1 — rs0 (3 pods: 1 primary + 2 secondary)
+# ──────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: shard1
+  namespace: proyecto01-restaurante
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true   # publica DNS aunque el pod no esté Ready (clave para rs.initiate)
+  selector:
+    app: shard1
+  ports:
+    - port: 27017
+      targetPort: 27017
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: shard1
+  namespace: proyecto01-restaurante
+spec:
+  serviceName: shard1
+  replicas: 3
+  selector:
+    matchLabels:
+      app: shard1
+  template:
+    metadata:
+      labels:
+        app: shard1
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:7
+          command:
+            - mongod
+            - "--shardsvr"
+            - "--replSet"
+            - "rs0"
+            - "--port"
+            - "27017"          # --shardsvr defaultea a 27018, lo forzamos a 27017
+            - "--bind_ip_all"
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: shard1-data
+              mountPath: /data/db
+          readinessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 30
+            periodSeconds: 20
+  volumeClaimTemplates:
+    - metadata:
+        name: shard1-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+---
+# ──────────────────────────────────────
+# Shard 2 — rs1 (3 pods: 1 primary + 2 secondary)
+# ──────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: shard2
+  namespace: proyecto01-restaurante
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true   # publica DNS aunque el pod no esté Ready (clave para rs.initiate)
+  selector:
+    app: shard2
+  ports:
+    - port: 27017
+      targetPort: 27017
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: shard2
+  namespace: proyecto01-restaurante
+spec:
+  serviceName: shard2
+  replicas: 3
+  selector:
+    matchLabels:
+      app: shard2
+  template:
+    metadata:
+      labels:
+        app: shard2
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:7
+          command:
+            - mongod
+            - "--shardsvr"
+            - "--replSet"
+            - "rs1"
+            - "--port"
+            - "27017"
+            - "--bind_ip_all"
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: shard2-data
+              mountPath: /data/db
+          readinessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 30
+            periodSeconds: 20
+  volumeClaimTemplates:
+    - metadata:
+        name: shard2-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi

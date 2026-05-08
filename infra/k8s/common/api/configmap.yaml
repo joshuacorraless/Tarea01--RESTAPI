@@ -1,0 +1,26 @@
+# Variables no-secretas de la API.
+# Para alternar el motor de DB:
+#   kubectl edit configmap api-config -n proyecto01-restaurante
+#   (cambiar DB_ENGINE: "mongo" → "postgres" o viceversa)
+#   kubectl rollout restart deployment/api -n proyecto01-restaurante
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-config
+  namespace: proyecto01-restaurante
+data:
+  PORT: "3000"
+
+  # Motor activo. Mongo aprovecha el sharded cluster (rs0+rs1+csrs).
+  # Postgres usa el StatefulSet de postgres-service (sin sharding/replicación).
+  DB_ENGINE: "mongo"
+
+  # Conexiones a backends internos del cluster
+  MONGODB_URI: "mongodb://mongos-service:27017/restaurant_db"
+  REDIS_URL: "redis://redis-service:6379"
+
+  # Keycloak interno — el JWT issuer queda como http://keycloak-service:8080/realms/restaurant-realm
+  KEYCLOAK_BASE_URL: "http://keycloak-service:8080"
+  KEYCLOAK_REALM: "restaurant-realm"
+  KEYCLOAK_CLIENT_ID: "restaurant-api"
+  KEYCLOAK_ADMIN_CLIENT_ID: "admin-cli"

@@ -7,8 +7,13 @@
   },
   "variable": [
     {
+      "key": "baseUrlSearch",
+      "value": "http://localhost/search",
+      "type": "string"
+    },
+    {
       "key": "baseUrl",
-      "value": "http://localhost:3000/api",
+      "value": "http://localhost/api",
       "type": "string"
     },
     {
@@ -520,13 +525,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/reservations/available-tables?restaurantId={{restaurantId}}&reservadoPara=2025-12-01T19:00:00.000Z&duracion=90",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "reservations",
-                "available-tables"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["reservations", "available-tables"],
               "query": [
                 {
                   "key": "restaurantId",
@@ -778,6 +778,56 @@
               }
             },
             "url": "{{baseUrl}}/orders/{{orderId}}/status"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "id": "11111111-1111-1111-1111-111111111107",
+      "name": "ElasticSearch",
+      "item": [
+        {
+          "id": "22222222-2222-2222-2222-222222222231",
+          "name": "Search by Text",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrlSearch}}/products?q=casado",
+              "host": ["{{baseUrlSearch}}"],
+              "path": ["products"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "casado"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "22222222-2222-2222-2222-222222222232",
+          "name": "Search by Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrlSearch}}/products/category/Postres",
+              "host": ["{{baseUrlSearch}}"],
+              "path": ["products", "category", "Postres"]
+            }
+          },
+          "response": []
+        },
+        {
+          "id": "22222222-2222-2222-2222-222222222233",
+          "name": "Reindex Elasticsearch",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrlSearch}}/reindex"
           },
           "response": []
         }

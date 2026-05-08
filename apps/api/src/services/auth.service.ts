@@ -1,0 +1,135 @@
+import axios from 'axios';
+import { keycloakConfig } from '../config/keycloak';
+import { dao } from '../dao/DaoFactory';
+import { LoginInput, RegisterInput } from '../schemas/auth.schema';
+
+function splitFullName(fullName: string): { firstName: string; lastName: string } {
+  const nameParts = fullName.trim().split(/\s+/);
+  const firstName = nameParts[0];
+  const lastName = nameParts.slice(1).join(' ') || firstName;
+
+  return { firstName, lastName };
+}
+
+async function getAdminToken(): Promise<string> {
+  if (keycloakConfig.masterAdminUsername && keycloakConfig.masterAdminPassword) {
+    const adminParams = new URLSearchParams({
+      grant_type: 'password',
+      client_id: 'admin-cli',
+      username: keycloakConfig.masterAdminUsername,
+      password: keycloakConfig.masterAdminPassword,
+    });
+
+    const adminResponse = await axios.post(keycloakConfig.masterTokenUrl, adminParams, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+
+    return adminResponse.data.access_token;
+  }
+
+  const params = new URLSearchParams({
+    grant_type: 'client_credentials',
+    client_id: keycloakConfig.adminClientId,
+    client_secret: keycloakConfig.adminClientSecret,
+  });
+
+  const response = await axios.post(keycloakConfig.tokenUrl, params, {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  });
+
+  return response.data.access_token;
+}
+
+export async function registerUser(input: RegisterInput) {
+  const adminToken = await getAdminToken();
+  const { firstName, lastName } = splitFullName(input.fullName);
+
+  const createUserResponse = await axios.post(
+    `${keycloakConfig.adminBaseUrl}/users`,
+    {
+      username: input.email,
+      email: input.email,
+      emailVerified: true,
+      firstName,
+      lastName,
+      enabled: true,
+      credentials: [
+        {
+          type: 'password',
+          value: input.password,
+          temporary: false,
+        },
+      ],
+    },
+    {
+      headers: { Authorization: `Bearer ${adminToken}` },
+    }
+  );
+
+  // keycloak devuelve el id del usuario en el header location
+  const locationHeader = createUserResponse.headers.location;
+  const keycloakUserId = locationHeader.split('/').pop()!;
+
+  const rolesResponse = await axios.get(
+    `${keycloakConfig.adminBaseUrl}/roles/${input.role}`,
+    {
+      headers: { Authorization: `Bearer ${adminToken}` },
+    }
+  );
+  const roleRepresentation = rolesResponse.data;
+
+  await axios.post(
+    `${keycloakConfig.adminBaseUrl}/users/${keycloakUserId}/role-mappings/realm`,
+    [roleRepresentation],
+    {
+      headers: { Authorization: `Bearer ${adminToken}` },
+    }
+  );
+
+  // si falla el insert local hay que borrar el usuario en keycloak
+  // para no dejar usuarios huerfanos entre los dos sistemas
+  try {
+    const user = await dao.users.create({
+      fullName: input.fullName,
+      email: input.email,
+      externalAuthId: keycloakUserId,
+      role: input.role,
+      phone: input.phone || null,
+    });
+
+    return {
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.role,
+      phone: user.phone,
+    };
+  } catch {
+    await axios.delete(
+      `${keycloakConfig.adminBaseUrl}/users/${keycloakUserId}`,
+      { headers: { Authorization: `Bearer ${adminToken}` } }
+    );
+    throw new Error('failed to create local user record');
+  }
+}
+
+export async function loginUser(input: LoginInput) {
+  const params = new URLSearchParams({
+    grant_type: 'password',
+    client_id: keycloakConfig.clientId,
+    client_secret: keycloakConfig.clientSecret,
+    username: input.email,
+    password: input.password,
+  });
+
+  const response = await axios.post(keycloakConfig.tokenUrl, params, {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  });
+
+  return {
+    accessToken: response.data.access_token,
+    refreshToken: response.data.refresh_token,
+    expiresIn: response.data.expires_in,
+    tokenType: response.data.token_type,
+  };
+}

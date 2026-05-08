@@ -1,0 +1,66 @@
+# API principal — Deployment porque la API es stateless.
+# replicas: 1 inicial; se sube a N con `kubectl scale deployment api --replicas=N`
+# para demostrar escalado horizontal.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: proyecto01-restaurante
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: restaurant/api:dev
+          imagePullPolicy: IfNotPresent       # imagen local construida en Docker Desktop, no se pullea
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: api-config
+            - secretRef:
+                name: api-secrets
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 5
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: proyecto01-restaurante
+spec:
+  selector:
+    app: api
+  ports:
+    - port: 80                # exposición interna estándar; el Ingress también golpea acá
+      targetPort: 3000
+  type: ClusterIP

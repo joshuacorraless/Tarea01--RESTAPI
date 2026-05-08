@@ -1,0 +1,69 @@
+# Config Server Replica Set (csrs)
+# Guarda los metadatos del sharded cluster: qué chunk vive en qué shard.
+# 3 pods (1 primary + 2 secondary) — topología productiva, evita SPOF de los metadatos.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: configsvr
+  namespace: proyecto01-restaurante
+spec:
+  clusterIP: None              # headless — DNS por pod
+  publishNotReadyAddresses: true   # publica DNS aunque el pod no esté Ready (clave para rs.initiate)
+  selector:
+    app: configsvr
+  ports:
+    - port: 27017
+      targetPort: 27017
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: configsvr
+  namespace: proyecto01-restaurante
+spec:
+  serviceName: configsvr
+  replicas: 3
+  selector:
+    matchLabels:
+      app: configsvr
+  template:
+    metadata:
+      labels:
+        app: configsvr
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:7
+          command:
+            - mongod
+            - "--configsvr"
+            - "--replSet"
+            - "csrs"
+            - "--port"
+            - "27017"          # explícito: --configsvr defaultea a 27019
+            - "--bind_ip_all"
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: configsvr-data
+              mountPath: /data/db
+          readinessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 30
+            periodSeconds: 20
+  volumeClaimTemplates:
+    - metadata:
+        name: configsvr-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
