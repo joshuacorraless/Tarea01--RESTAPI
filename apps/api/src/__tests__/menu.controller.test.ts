@@ -29,7 +29,7 @@ const mockReq = (opts: Partial<AuthenticatedRequest> = {}) =>
 describe("Menu Controller", () => {
   beforeEach(() => jest.clearAllMocks());
 
-  // ─── createMenu ────────────────────────────────────────────
+  // createMenu
   describe("POST /menus", () => {
     it("crea un menú y responde 201", async () => {
       const fakeMenu = { id: "1", name: "Menú del día" };
@@ -63,7 +63,7 @@ describe("Menu Controller", () => {
     });
   });
 
-  // ─── getMenuById ───────────────────────────────────────────
+  // getMenuById
   describe("GET /menus/:id", () => {
     it("retorna el menú si existe", async () => {
       const fakeMenu = { id: "1", name: "Menú del día" };
@@ -105,7 +105,7 @@ describe("Menu Controller", () => {
     });
   });
 
-  // ─── getMenusByRestaurant ──────────────────────────────────
+  // getMenusByRestaurant
   describe("GET /restaurants/:restaurantId/menus", () => {
     it("retorna la lista de menús del restaurante", async () => {
       const fakeMenus = [{ id: "1" }, { id: "2" }];
@@ -146,7 +146,7 @@ describe("Menu Controller", () => {
     });
   });
 
-  // ─── updateMenu ────────────────────────────────────────────
+  // updateMenu
   describe("PUT /menus/:id", () => {
     it("actualiza el menú si existe", async () => {
       const updated = { id: "1", name: "Menú actualizado" };
@@ -191,7 +191,7 @@ describe("Menu Controller", () => {
     });
   });
 
-  // ─── deleteMenu ────────────────────────────────────────────
+  // deleteMenu
   describe("DELETE /menus/:id", () => {
     it("elimina el menú exitosamente", async () => {
       (menuService.deleteMenuService as jest.Mock).mockResolvedValue(undefined);
@@ -221,7 +221,7 @@ describe("Menu Controller", () => {
     });
   });
 
-  // ─── createMenuItem ────────────────────────────────────────
+  // createMenuItem
   describe("POST /menus/:menuId/items", () => {
     it("crea un item y responde 201", async () => {
       const fakeItem = { id: "i-1", name: "Tacos" };
@@ -260,7 +260,7 @@ describe("Menu Controller", () => {
     });
   });
 
-  // ─── getMenuItems ──────────────────────────────────────────
+  // getMenuItems
   describe("GET /menus/:menuId/items", () => {
     it("retorna los items del menú", async () => {
       const fakeItems = [{ id: "i-1" }, { id: "i-2" }];
@@ -293,7 +293,7 @@ describe("Menu Controller", () => {
     });
   });
 
-  // ─── updateMenuItem ────────────────────────────────────────
+  // updateMenuItem
   describe("PUT /menus/items/:itemId", () => {
     it("actualiza el item si existe", async () => {
       const updated = { id: "i-1", name: "Tacos updated" };
@@ -343,7 +343,7 @@ describe("Menu Controller", () => {
     });
   });
 
-  // ─── deleteMenuItem ────────────────────────────────────────
+  // deleteMenuItem
   describe("DELETE /menus/items/:itemId", () => {
     it("elimina el item exitosamente", async () => {
       (menuService.deleteMenuItemService as jest.Mock).mockResolvedValue(

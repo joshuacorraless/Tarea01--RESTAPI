@@ -18,7 +18,7 @@ import {
 jest.mock("../config/database", () => ({ query: jest.fn() }));
 const mockedPool = pool as jest.Mocked<typeof pool>;
 
-// ─── Datos reutilizables ─────────────────────────────────────────────────────
+// Datos reutilizables
 const menuRow = {
   id: "1",
   idrestaurante: "r1",
@@ -65,13 +65,12 @@ const mappedItem = {
 
 beforeEach(() => jest.clearAllMocks());
 
-// ─── Menús ───────────────────────────────────────────────────────────────────
+// Menús
 describe("createMenuService", () => {
   it("crea un menú y retorna los datos mapeados", async () => {
     (mockedPool.query as jest.Mock).mockResolvedValueOnce({ rows: [menuRow] });
 
     const result = await createMenuService({
-      // ← createMenuService, no createMenuItemService
       idRestaurante: "r1",
       nombre: "Menú Principal",
       detalles: "Almuerzo",
@@ -88,7 +87,6 @@ describe("createMenuService", () => {
   it("usa activo=true por defecto si no se pasa", async () => {
     (mockedPool.query as jest.Mock).mockResolvedValueOnce({ rows: [menuRow] });
     await createMenuService({
-      // ← createMenuService
       idRestaurante: "r1",
       nombre: "X",
       detalles: "Y",
@@ -150,7 +148,7 @@ describe("deleteMenuService", () => {
   });
 });
 
-// ─── Items del menú ──────────────────────────────────────────────────────────
+// Items del menú
 describe("createMenuItemService", () => {
   it("crea un item y retorna los datos mapeados", async () => {
     (mockedPool.query as jest.Mock).mockResolvedValueOnce({ rows: [itemRow] });
@@ -189,7 +187,7 @@ describe("getMenuItemsService", () => {
     (mockedPool.query as jest.Mock).mockResolvedValueOnce({ rows: [itemRow] });
     const result = await getMenuItemsService("1");
     expect(result).toHaveLength(1);
-    expect(result[0].precio).toBe(2500); // Number() aplicado
+    expect(result[0].precio).toBe(2500);
   });
 });
 

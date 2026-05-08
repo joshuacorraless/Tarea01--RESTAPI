@@ -35,7 +35,7 @@ const mockNext: NextFunction = jest.fn();
 describe("cache.middleware", () => {
   beforeEach(() => jest.clearAllMocks());
 
-  // ── cacheMiddleware ──────────────────────────────────────────────────────────
+  // cacheMiddleware
 
   describe("cacheMiddleware", () => {
     it("llama next() directamente si Redis no esta disponible", async () => {
@@ -116,7 +116,7 @@ describe("cache.middleware", () => {
     });
   });
 
-  // ── invalidateCache ──────────────────────────────────────────────────────────
+  // invalidateCache
 
   describe("invalidateCache", () => {
     it("no hace nada si Redis no esta disponible", async () => {

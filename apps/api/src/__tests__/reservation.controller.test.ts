@@ -27,7 +27,7 @@ const mockReq = (opts: Partial<AuthenticatedRequest> = {}) =>
 describe("Reservation Controller", () => {
   beforeEach(() => jest.clearAllMocks());
 
-  // ─── getAvailableTables ────────────────────────────────────
+  // getAvailableTables
   describe("GET /reservations/available", () => {
     it("retorna mesas disponibles con parámetros válidos", async () => {
       const fakeTables = [{ id: "t-1" }, { id: "t-2" }];
@@ -125,7 +125,7 @@ describe("Reservation Controller", () => {
     });
   });
 
-  // ─── createReservation ─────────────────────────────────────
+  // createReservation
   describe("POST /reservations", () => {
     it("crea una reserva e inyecta idCliente del JWT", async () => {
       const fakeReservation = { id: "res-1", idCliente: "user-1" };
@@ -176,7 +176,7 @@ describe("Reservation Controller", () => {
     });
   });
 
-  // ─── getReservationById ────────────────────────────────────
+  // getReservationById
   describe("GET /reservations/:id", () => {
     it("retorna la reserva si existe", async () => {
       const fakeReservation = { id: "res-1" };
@@ -222,7 +222,7 @@ describe("Reservation Controller", () => {
     });
   });
 
-  // ─── getMyReservations ─────────────────────────────────────
+  // getMyReservations
   describe("GET /reservations/me", () => {
     it("retorna las reservas del usuario autenticado", async () => {
       const fakeReservations = [{ id: "res-1" }, { id: "res-2" }];
@@ -257,7 +257,7 @@ describe("Reservation Controller", () => {
     });
   });
 
-  // ─── getReservationsByRestaurant ───────────────────────────
+  // getReservationsByRestaurant
   describe("GET /restaurants/:restaurantId/reservations", () => {
     it("retorna las reservas del restaurante", async () => {
       const fakeReservations = [{ id: "res-1" }];
@@ -298,7 +298,7 @@ describe("Reservation Controller", () => {
     });
   });
 
-  // ─── cancelReservation ─────────────────────────────────────
+  // cancelReservation
   describe("DELETE /reservations/:id", () => {
     it("cancela la reserva si existe", async () => {
       const cancelled = { id: "res-1", status: "cancelled" };

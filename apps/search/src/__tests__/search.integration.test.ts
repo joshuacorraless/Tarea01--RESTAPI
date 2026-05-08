@@ -1,15 +1,11 @@
-// search.integration.test.ts
-//
 // Prueba el flujo completo del microservicio search:
-//   HTTP request → rate-limiter middleware → controller → service → respuesta
-//
-// Importa la app del search (apps/search/src/app.ts), no la de la API.
+//   HTTP request -> rate-limiter middleware -> controller -> service -> respuesta
 // Mockea esClient para no necesitar ElasticSearch real.
 
 import request from 'supertest';
 import searchApp from '../app';
 
-// ─── Mock: ElasticSearch ──────────────────────────────────────────────────────
+//  Mock: ElasticSearch
 // El server.ts llama createIndex() al arrancar, pero en tests importamos
 // solo app.ts — así evitamos que intente conectarse a ES al importar.
 // IMPORTANTE: la ruta debe ser relativa al archivo de test, no absoluta.
@@ -28,7 +24,7 @@ const mockEsClient = esClient as jest.Mocked<typeof esClient>;
 
 const searchApi = request(searchApp);
 
-// ─── Fixture ──────────────────────────────────────────────────────────────────
+// Fixture
 const fakeProduct = {
   id: 'item-1',
   restaurantId: 'rest-1',
@@ -46,7 +42,7 @@ function buildEsResponse(docs: typeof fakeProduct[]) {
 
 beforeEach(() => jest.clearAllMocks());
 
-// ─── GET /health ──────────────────────────────────────────────────────────────
+// GET /health
 describe('GET /health', () => {
   it('responde 200 con status ok', async () => {
     const res = await searchApi.get('/health');
@@ -57,7 +53,7 @@ describe('GET /health', () => {
   });
 });
 
-// ─── GET /search/products?q= ──────────────────────────────────────────────────
+// GET /search/products?q=
 describe('GET /search/products', () => {
   it('responde 200 con resultados cuando q tiene valor', async () => {
     (mockEsClient.search as jest.Mock).mockResolvedValueOnce(
@@ -99,7 +95,7 @@ describe('GET /search/products', () => {
   });
 });
 
-// ─── GET /search/products/category/:categoria ─────────────────────────────────
+// GET /search/products/category/:categoria
 describe('GET /search/products/category/:categoria', () => {
   it('responde 200 con los productos de la categoría', async () => {
     (mockEsClient.search as jest.Mock).mockResolvedValueOnce(
@@ -144,7 +140,7 @@ describe('GET /search/products/category/:categoria', () => {
   });
 });
 
-// ─── POST /search/reindex ─────────────────────────────────────────────────────
+// POST /search/reindex
 describe('POST /search/reindex', () => {
   it('responde 200 con el conteo de productos indexados', async () => {
     global.fetch = jest.fn().mockResolvedValueOnce({

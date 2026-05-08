@@ -11,7 +11,7 @@ import {
 jest.mock("../config/database", () => ({ query: jest.fn() }));
 const mockedPool = pool as jest.Mocked<typeof pool>;
 
-// ─── Datos reutilizables ─────────────────────────────────────────────────────
+// Datos reutilizables
 const reservationRow = {
   id: "res1",
   idrestaurante: "r1",
@@ -52,7 +52,7 @@ const mappedReservation = {
 
 beforeEach(() => jest.clearAllMocks());
 
-// ─── Mesas disponibles ───────────────────────────────────────────────────────
+// Mesas disponibles
 describe("getAvailableTablesService", () => {
   it("retorna mesas disponibles mapeadas", async () => {
     (mockedPool.query as jest.Mock).mockResolvedValueOnce({ rows: [tableRow] });
@@ -88,7 +88,7 @@ describe("getAvailableTablesService", () => {
   });
 });
 
-// ─── Crear reserva ───────────────────────────────────────────────────────────
+// Crear reserva
 describe("createReservationService", () => {
   const input = {
     idCliente: "kc-user-123",
@@ -96,7 +96,7 @@ describe("createReservationService", () => {
     mesaId: "mesa1",
     tamannoReserva: 2,
     reservadoPara: "2026-04-01T12:00:00Z",
-    duracionReserva: 90, // ← agregar esto
+    duracionReserva: 90,
   };
 
   it("crea la reserva correctamente", async () => {
@@ -137,7 +137,7 @@ describe("createReservationService", () => {
   });
 });
 
-// ─── Obtener reserva por ID ───────────────────────────────────────────────────
+// Obtener reserva por ID
 describe("getReservationByIdService", () => {
   it("retorna la reserva si existe", async () => {
     (mockedPool.query as jest.Mock).mockResolvedValueOnce({
@@ -152,7 +152,7 @@ describe("getReservationByIdService", () => {
   });
 });
 
-// ─── Reservas por cliente ─────────────────────────────────────────────────────
+// Reservas por cliente
 describe("getReservationsByClientService", () => {
   it("retorna las reservas del cliente", async () => {
     (mockedPool.query as jest.Mock)
@@ -170,7 +170,7 @@ describe("getReservationsByClientService", () => {
   });
 });
 
-// ─── Reservas por restaurante ─────────────────────────────────────────────────
+// Reservas por restaurante
 describe("getReservationsByRestaurantService", () => {
   it("retorna las reservas del restaurante", async () => {
     (mockedPool.query as jest.Mock).mockResolvedValueOnce({
@@ -182,7 +182,7 @@ describe("getReservationsByRestaurantService", () => {
   });
 });
 
-// ─── Cancelar reserva ─────────────────────────────────────────────────────────
+// Cancelar reserva
 describe("cancelReservationService", () => {
   it("cancela la reserva y la retorna", async () => {
     (mockedPool.query as jest.Mock)

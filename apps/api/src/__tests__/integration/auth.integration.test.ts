@@ -1,13 +1,3 @@
-// auth.integration.test.ts
-//
-// Prueba el flujo completo de autenticación:
-//   HTTP request → validate middleware (Zod) → auth controller → auth service
-//
-// Lo que se valida acá que los unitarios NO validan:
-//   - El middleware `validate` rechaza bodies inválidos con 400 ANTES de llegar al controller
-//   - El formato real de la respuesta JSON (success, message, data)
-//   - El routing correcto (POST /api/auth/register, POST /api/auth/login)
-
 import '../setup';                         // activa todos los mocks globales
 import { api } from './setup';
 import pool from '../../config/database';
@@ -18,7 +8,7 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 const mockedPool = pool as jest.Mocked<typeof pool>;
 
-// ─── POST /api/auth/register ──────────────────────────────────────────────────
+// POST /api/auth/register
 describe('POST /api/auth/register', () => {
   const validBody = {
     fullName: 'Carlos Mora',
@@ -29,7 +19,7 @@ describe('POST /api/auth/register', () => {
   };
 
   it('registra un usuario y responde 201 con el formato correcto', async () => {
-    // Simular Keycloak: getAdminToken → crear usuario → getRoleRep → asignarRol
+    // Simular Keycloak: getAdminToken -> crear usuario -> getRoleRep -> asignarRol
     mockedAxios.post
       .mockResolvedValueOnce({ data: { access_token: 'admin-tok' } })
       .mockResolvedValueOnce({ headers: { location: 'http://kc/users/kc-123' } })
@@ -100,7 +90,7 @@ describe('POST /api/auth/register', () => {
   });
 });
 
-// ─── POST /api/auth/login ─────────────────────────────────────────────────────
+// POST /api/auth/login
 describe('POST /api/auth/login', () => {
   const validBody = {
     email: 'carlos@test.com',

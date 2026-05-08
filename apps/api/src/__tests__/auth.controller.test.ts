@@ -13,7 +13,7 @@ const mockRes = () => ({}) as Response;
 describe("Auth Controller", () => {
   beforeEach(() => jest.clearAllMocks());
 
-  // ─── register ───────────────────────────────────────────────
+  // register
   describe("POST /auth/register", () => {
     it("registra un usuario y responde 201", async () => {
       const fakeUser = { id: "1", email: "a@b.com" };
@@ -73,7 +73,7 @@ describe("Auth Controller", () => {
     });
   });
 
-  // ─── login ──────────────────────────────────────────────────
+  // login
   describe("POST /auth/login", () => {
     it("hace login y devuelve tokens", async () => {
       const fakeTokens = { access_token: "jwt-abc", refresh_token: "ref-xyz" };

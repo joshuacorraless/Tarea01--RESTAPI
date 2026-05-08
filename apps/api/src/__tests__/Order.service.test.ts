@@ -13,13 +13,13 @@ jest.mock("../config/database", () => ({
 }));
 const mockedPool = pool as jest.Mocked<typeof pool>;
 
-// ─── Mock del cliente de transacción ─────────────────────────────────────────
+// Mock del cliente de transacción
 const mockClient = {
   query: jest.fn(),
   release: jest.fn(),
 };
 
-// ─── Datos reutilizables ─────────────────────────────────────────────────────
+// Datos reutilizables
 const orderRow = {
   id: "ord1",
   idrestaurante: "r1",
@@ -56,7 +56,7 @@ beforeEach(() => {
   mockClient.query.mockResolvedValue({ rows: [] }); // default vacío
 });
 
-// ─── createOrderService ───────────────────────────────────────────────────────
+// createOrderService
 describe("createOrderService", () => {
   const input = {
     idCliente: "kc-user-123",
@@ -128,7 +128,7 @@ describe("createOrderService", () => {
   });
 });
 
-// ─── getOrderByIdService ──────────────────────────────────────────────────────
+// getOrderByIdService
 describe("getOrderByIdService", () => {
   it("retorna la orden si existe", async () => {
     (mockedPool.query as jest.Mock).mockResolvedValueOnce({ rows: [orderRow] });
@@ -148,7 +148,7 @@ describe("getOrderByIdService", () => {
   });
 });
 
-// ─── getOrdersByClientService ─────────────────────────────────────────────────
+// getOrdersByClientService
 describe("getOrdersByClientService", () => {
   it("retorna las órdenes del cliente mapeadas", async () => {
     (mockedPool.query as jest.Mock)
@@ -167,7 +167,7 @@ describe("getOrdersByClientService", () => {
   });
 });
 
-// ─── addItemToOrderService ────────────────────────────────────────────────────
+// addItemToOrderService
 describe("addItemToOrderService", () => {
   const itemInput = { idItemMenu: "item2", cantidad: 1 };
 
@@ -225,7 +225,7 @@ describe("addItemToOrderService", () => {
   });
 });
 
-// ─── updateOrderStatusService ─────────────────────────────────────────────────
+// updateOrderStatusService
 describe("updateOrderStatusService", () => {
   it("actualiza el estado y retorna los datos", async () => {
     const updatedRow = {

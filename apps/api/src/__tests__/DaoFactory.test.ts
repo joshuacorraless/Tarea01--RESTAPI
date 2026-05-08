@@ -1,14 +1,3 @@
-// DaoFactory.test.ts
-//
-// El DaoFactory usa una IIFE (función que se ejecuta inmediatamente al importar).
-// Eso hace que jest.mock() normal no funcione para cambiar DB_ENGINE después
-// de que el módulo ya fue cargado.
-//
-// La solución es jest.isolateModules(): carga el módulo desde cero dentro
-// de un contexto aislado, permitiendo cambiar la env antes de cada import.
-
-// ─── Mock de todas las dependencias de BD ────────────────────────────────────
-// Necesitamos mockear estos módulos para que no intenten conectarse a nada real.
 jest.mock('../config/database', () => ({
   connectPostgres: jest.fn().mockResolvedValue(undefined),
   query: jest.fn(),
@@ -18,7 +7,7 @@ jest.mock('../config/database.mongo', () => ({
   connectMongo: jest.fn().mockResolvedValue(undefined),
 }));
 
-// Mocks de todos los DAOs — cada uno retorna una clase vacía
+// Mocks de todos los DAOs cada uno retorna una clase vacía
 jest.mock('../dao/postgres/PostgresUserDao', () => ({ PostgresUserDao: jest.fn().mockImplementation(() => ({})) }));
 jest.mock('../dao/postgres/PostgresRestaurantDao', () => ({ PostgresRestaurantDao: jest.fn().mockImplementation(() => ({})) }));
 jest.mock('../dao/postgres/PostgresMenuDao', () => ({ PostgresMenuDao: jest.fn().mockImplementation(() => ({})) }));
@@ -33,7 +22,7 @@ jest.mock('../dao/mongo/MongoMenuItemDao', () => ({ MongoMenuItemDao: jest.fn().
 jest.mock('../dao/mongo/MongoReservationDao', () => ({ MongoReservationDao: jest.fn().mockImplementation(() => ({})) }));
 jest.mock('../dao/mongo/MongoOrderDao', () => ({ MongoOrderDao: jest.fn().mockImplementation(() => ({})) }));
 
-// ─── Tests ────────────────────────────────────────────────────────────────────
+// Tests
 describe('DaoFactory — dao registry', () => {
   afterEach(() => {
     jest.resetModules();

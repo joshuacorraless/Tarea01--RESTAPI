@@ -8,7 +8,7 @@ import {
 jest.mock("../config/database", () => ({ query: jest.fn() }));
 const mockedPool = pool as jest.Mocked<typeof pool>;
 
-// ─── Datos reutilizables ─────────────────────────────────────────────────────
+// Datos reutilizables
 const userRow = {
   id: "u1",
   full_name: "Ana Mora",
@@ -32,7 +32,7 @@ const mappedUser = {
 
 beforeEach(() => jest.clearAllMocks());
 
-// ─── getUserByExternalId ──────────────────────────────────────────────────────
+// getUserByExternalId
 describe("getUserByExternalId", () => {
   it("retorna el usuario mapeado si existe", async () => {
     (mockedPool.query as jest.Mock).mockResolvedValueOnce({ rows: [userRow] });
@@ -54,7 +54,7 @@ describe("getUserByExternalId", () => {
   });
 });
 
-// ─── updateUser ───────────────────────────────────────────────────────────────
+// updateUser
 describe("updateUser", () => {
   const updatedRow = {
     ...userRow,
@@ -98,12 +98,12 @@ describe("updateUser", () => {
 
     await updateUser("u1", "kc-user-123", {});
     const call = (mockedPool.query as jest.Mock).mock.calls[1];
-    expect(call[1][1]).toBeNull(); // fullName
-    expect(call[1][2]).toBeNull(); // phone
+    expect(call[1][1]).toBeNull();
+    expect(call[1][2]).toBeNull();
   });
 });
 
-// ─── softDeleteUser ───────────────────────────────────────────────────────────
+// softDeleteUser
 describe("softDeleteUser", () => {
   it("ejecuta el soft delete si el usuario es dueño del recurso", async () => {
     (mockedPool.query as jest.Mock)

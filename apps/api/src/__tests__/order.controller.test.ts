@@ -25,7 +25,7 @@ const mockReq = (opts: Partial<AuthenticatedRequest> = {}) =>
 describe("Order Controller", () => {
   beforeEach(() => jest.clearAllMocks());
 
-  // ─── createOrder ───────────────────────────────────────────
+  // createOrder
   describe("POST /orders", () => {
     it("crea una orden e inyecta idCliente del JWT", async () => {
       const fakeOrder = { id: "o-1", idCliente: "user-1" };
@@ -62,7 +62,7 @@ describe("Order Controller", () => {
     });
   });
 
-  // ─── getOrderById ──────────────────────────────────────────
+  // getOrderById
   describe("GET /orders/:id", () => {
     it("retorna la orden si existe", async () => {
       const fakeOrder = { id: "o-1" };
@@ -106,7 +106,7 @@ describe("Order Controller", () => {
     });
   });
 
-  // ─── getMyOrders ───────────────────────────────────────────
+  // getMyOrders
   describe("GET /orders/me", () => {
     it("retorna las órdenes del usuario autenticado", async () => {
       const fakeOrders = [{ id: "o-1" }, { id: "o-2" }];
@@ -141,7 +141,7 @@ describe("Order Controller", () => {
     });
   });
 
-  // ─── addItemToOrder ────────────────────────────────────────
+  // addItemToOrder
   describe("POST /orders/:id/items", () => {
     it("agrega un item a la orden y responde 201", async () => {
       const fakeResult = { orderId: "o-1", itemId: "i-1" };
@@ -208,7 +208,7 @@ describe("Order Controller", () => {
     });
   });
 
-  // ─── updateOrderStatus ─────────────────────────────────────
+  // updateOrderStatus
   describe("PUT /orders/:id/status", () => {
     it("actualiza el estado de la orden", async () => {
       const updated = { id: "o-1", status: "completed" };

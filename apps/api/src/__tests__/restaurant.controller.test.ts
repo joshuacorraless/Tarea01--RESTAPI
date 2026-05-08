@@ -19,7 +19,7 @@ const mockReq = (opts: Partial<AuthenticatedRequest> = {}) =>
 describe("Restaurant Controller", () => {
   beforeEach(() => jest.clearAllMocks());
 
-  // ─── create ────────────────────────────────────────────────
+  // create
   describe("POST /restaurants", () => {
     it("crea un restaurante con el sub del admin como owner", async () => {
       const fakeRestaurant = { id: "r-1", name: "La Trattoria" };
@@ -56,7 +56,7 @@ describe("Restaurant Controller", () => {
     });
   });
 
-  // ─── list ──────────────────────────────────────────────────
+  // list
   describe("GET /restaurants", () => {
     it("retorna la lista de restaurantes disponibles", async () => {
       const fakeList = [{ id: "r-1" }, { id: "r-2" }];

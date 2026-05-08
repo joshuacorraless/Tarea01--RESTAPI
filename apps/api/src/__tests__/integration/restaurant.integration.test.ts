@@ -1,15 +1,3 @@
-// restaurant.integration.test.ts
-//
-// Prueba el flujo completo de restaurantes:
-//   HTTP request → cacheMiddleware → authenticate → authorize → validate → controller → service
-//
-// Lo que se valida acá que los unitarios NO validan:
-//   - GET /api/restaurants es PÚBLICO (sin token) y tiene caché
-//   - POST /api/restaurants requiere autenticación Y rol restaurant_admin
-//   - La respuesta pasa por el formato estándar { success, message, data }
-//   - El header X-Cache: HIT aparece cuando Redis tiene datos en caché
-//   - El header X-Cache: MISS aparece cuando Redis no tiene datos (primer request)
-
 import '../setup';
 import { api, mockAuthUser } from './setup';
 import pool from '../../config/database';
@@ -17,7 +5,6 @@ import * as redisConfig from '../../config/redis';
 
 const mockedPool = pool as jest.Mocked<typeof pool>;
 
-// ─── Fixture ──────────────────────────────────────────────────────────────────
 const restaurantRow = {
   id: 'rest-1',
   name: 'La Soda del TEC',
@@ -32,8 +19,7 @@ const restaurantRow = {
   admin_email: 'carlos@admin.com',
 };
 
-// Respuesta cacheada que Redis devuelve en un HIT — mismo formato que
-// res.json() produciría en un request real (lo que el middleware guardó).
+// Respuesta cacheada que Redis devuelve en un HIT
 const cachedResponse = {
   success: true,
   message: 'restaurants retrieved successfully',
@@ -50,7 +36,7 @@ const cachedResponse = {
   ],
 };
 
-// ─── GET /api/restaurants — sin caché (MISS) ──────────────────────────────────
+// GET /api/restaurants — sin caché (MISS)
 describe('GET /api/restaurants', () => {
   it('responde 200 con la lista de restaurantes sin token', async () => {
     // Este endpoint es público — no requiere Authorization header
@@ -95,7 +81,7 @@ describe('GET /api/restaurants', () => {
   });
 });
 
-// ─── GET /api/restaurants — caché Redis ──────────────────────────────────────
+// GET /api/restaurants — caché Redis
 // Estos tests sobreescriben temporalmente el mock de Redis del setup (que
 // devuelve null) para simular un cliente real con datos en caché.
 // Usan beforeEach/afterEach para restaurar el mock original después de cada
@@ -123,7 +109,7 @@ describe('GET /api/restaurants — caché Redis', () => {
     expect(res.headers['x-cache']).toBe('HIT');
     expect(res.body).toEqual(cachedResponse);
 
-    // La BD NO fue consultada — el caché cortocircuita el flujo
+    // La BD NO fue consultada
     expect(mockedPool.query).not.toHaveBeenCalled();
   });
 
@@ -171,18 +157,17 @@ describe('GET /api/restaurants — caché Redis', () => {
       rows: [restaurantRow],
     });
 
-    // No debe romper el request — el middleware tiene try/catch y llama next()
     const res = await api.get('/api/restaurants');
 
     expect(res.status).toBe(200);
     expect(res.body.data).toHaveLength(1);
 
-    // Redis falló → no intentó guardar el resultado
+    // Redis falló
     expect(mockRedisClient.setEx).not.toHaveBeenCalled();
   });
 });
 
-// ─── POST /api/restaurants ────────────────────────────────────────────────────
+// POST /api/restaurants
 describe('POST /api/restaurants', () => {
   const validBody = {
     name: 'La Trattoria',

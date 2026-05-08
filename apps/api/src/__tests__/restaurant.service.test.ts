@@ -7,7 +7,7 @@ import {
 jest.mock("../config/database", () => ({ query: jest.fn() }));
 const mockedPool = pool as jest.Mocked<typeof pool>;
 
-// ─── Datos reutilizables ─────────────────────────────────────────────────────
+// Datos reutilizables
 const adminRow = { id: "u1", external_auth_id: "kc-admin-1" };
 
 const restaurantRow = {
@@ -41,7 +41,7 @@ const mappedRestaurant = {
 
 beforeEach(() => jest.clearAllMocks());
 
-// ─── createRestaurant ─────────────────────────────────────────────────────────
+// createRestaurant
 describe("createRestaurant", () => {
   const input = {
     name: "La Soda",
@@ -75,7 +75,7 @@ describe("createRestaurant", () => {
 
     await createRestaurant("kc-admin-1", { name: "X", address: "Y" });
     const call = (mockedPool.query as jest.Mock).mock.calls[1];
-    expect(call[1][1]).toBeNull(); // description
+    expect(call[1][1]).toBeNull();
   });
 
   it("pasa phone como null si no se proporciona", async () => {
@@ -85,7 +85,7 @@ describe("createRestaurant", () => {
 
     await createRestaurant("kc-admin-1", { name: "X", address: "Y" });
     const call = (mockedPool.query as jest.Mock).mock.calls[1];
-    expect(call[1][3]).toBeNull(); // phone
+    expect(call[1][3]).toBeNull(); 
   });
 
   it("llama a sp_get_user_by_external_id con el externalId correcto", async () => {
@@ -102,7 +102,7 @@ describe("createRestaurant", () => {
   });
 });
 
-// ─── listRestaurants ──────────────────────────────────────────────────────────
+// listRestaurants
 describe("listRestaurants", () => {
   it("retorna la lista de restaurantes con info del admin", async () => {
     (mockedPool.query as jest.Mock).mockResolvedValueOnce({

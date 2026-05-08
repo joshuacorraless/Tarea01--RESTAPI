@@ -25,7 +25,6 @@ import { sensitiveLimiter } from "../middlewares/rateLimit.middleware";
 
 const router = Router();
 
-// rutas fijas antes de las que tienen /:param
 router.get("/restaurant/:restaurantId", cacheMiddleware(120) as any, getMenusByRestaurant);
 router.get('/items/all', getAllMenuItems);
 router.post(

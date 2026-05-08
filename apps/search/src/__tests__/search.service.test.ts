@@ -229,7 +229,7 @@ describe('reindex', () => {
       items: [{ index: { error: { reason: 'document too large' } } }],
     });
 
-    // No debe lanzar — el service solo logea los errores parciales
+    // service solo logea los errores parciales
     await expect(reindex([product1])).resolves.toEqual({ indexed: 1 });
   });
 

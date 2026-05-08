@@ -8,7 +8,7 @@ import { MongoReservationDao } from '../dao/mongo/MongoReservationDao';
 import { MongoRestaurantDao } from '../dao/mongo/MongoRestaurantDao';
 import { MongoUserDao } from '../dao/mongo/MongoUserDao';
 
-// ─── Mocks de modelos ────────────────────────────────────────────────────────
+// Mocks de modelos
 
 jest.mock('../dao/mongo/models/UserModel', () => ({
   UserModel: {
@@ -86,8 +86,6 @@ const mReservation = ReservationModel as jest.Mocked<typeof ReservationModel>;
 const mOrder = OrderModel as jest.Mocked<typeof OrderModel>;
 
 beforeEach(() => jest.clearAllMocks());
-
-// ─── Fixtures ────────────────────────────────────────────────────────────────
 
 const NOW = new Date('2025-01-01T10:00:00Z');
 
@@ -188,7 +186,7 @@ const orderDoc = {
   ],
 };
 
-// ─── MongoUserDao ────────────────────────────────────────────────────────────
+// MongoUserDao
 
 describe('MongoUserDao', () => {
   const dao = new MongoUserDao();
@@ -250,7 +248,7 @@ describe('MongoUserDao', () => {
   });
 });
 
-// ─── MongoRestaurantDao ──────────────────────────────────────────────────────
+// MongoRestaurantDao
 
 describe('MongoRestaurantDao', () => {
   const dao = new MongoRestaurantDao();
@@ -286,7 +284,7 @@ describe('MongoRestaurantDao', () => {
   });
 });
 
-// ─── MongoMenuDao ────────────────────────────────────────────────────────────
+// MongoMenuDao
 
 describe('MongoMenuDao', () => {
   const dao = new MongoMenuDao();
@@ -339,7 +337,7 @@ describe('MongoMenuDao', () => {
   });
 });
 
-// ─── MongoMenuItemDao ────────────────────────────────────────────────────────
+// MongoMenuItemDao
 
 describe('MongoMenuItemDao', () => {
   const dao = new MongoMenuItemDao();
@@ -396,7 +394,7 @@ describe('MongoMenuItemDao', () => {
   });
 });
 
-// ─── MongoReservationDao ─────────────────────────────────────────────────────
+// MongoReservationDao
 
 describe('MongoReservationDao', () => {
   const dao = new MongoReservationDao();
@@ -501,7 +499,7 @@ describe('MongoReservationDao', () => {
   });
 });
 
-// ─── MongoOrderDao ───────────────────────────────────────────────────────────
+// MongoOrderDao
 
 describe('MongoOrderDao', () => {
   const dao = new MongoOrderDao();

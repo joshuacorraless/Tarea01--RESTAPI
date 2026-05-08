@@ -1,7 +1,6 @@
 import { Response } from "express";
 import { sendSuccess, sendError } from "../utils/response";
 
-// mock de res con encadenamiento status().json()
 function mockRes() {
   const json = jest.fn();
   const status = jest.fn().mockReturnValue({ json });

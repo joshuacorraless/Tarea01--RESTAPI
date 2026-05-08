@@ -19,7 +19,7 @@ const mockReq = (opts: Partial<AuthenticatedRequest> = {}) =>
 describe("User Controller", () => {
   beforeEach(() => jest.clearAllMocks());
 
-  // ─── getMe ─────────────────────────────────────────────────
+  // getMe
   describe("GET /users/me", () => {
     it("retorna el perfil del usuario autenticado", async () => {
       const fakeUser = { id: "u-1", email: "a@b.com" };
@@ -52,7 +52,7 @@ describe("User Controller", () => {
     });
   });
 
-  // ─── update ────────────────────────────────────────────────
+  // update
   describe("PUT /users/:id", () => {
     it("actualiza el usuario exitosamente", async () => {
       const updated = { id: "u-1", email: "new@b.com" };
@@ -102,7 +102,7 @@ describe("User Controller", () => {
     });
   });
 
-  // ─── remove ────────────────────────────────────────────────
+  // remove
   describe("DELETE /users/:id", () => {
     it("elimina (soft delete) el usuario exitosamente", async () => {
       (userService.softDeleteUser as jest.Mock).mockResolvedValue(undefined);

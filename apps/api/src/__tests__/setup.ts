@@ -32,7 +32,7 @@ jest.mock("../config/keycloak", () => ({
 }));
 
 // Redis retorna null en tests: el cache middleware llama next() y los controllers
-// ejecutan la invalidacion sin efecto — ningun test necesita Redis real.
+// ejecutan la invalidacion sin efecto
 jest.mock("../config/redis", () => ({
   connectRedis: jest.fn().mockResolvedValue(undefined),
   getRedisClient: jest.fn().mockReturnValue(null),

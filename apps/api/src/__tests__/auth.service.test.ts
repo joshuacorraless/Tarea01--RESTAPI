@@ -20,7 +20,7 @@ jest.mock("../config/keycloak", () => ({
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 const mockedPool = pool as jest.Mocked<typeof pool>;
 
-// ─── Datos reutilizables ─────────────────────────────────────────────────────
+// Datos reutilizables
 const ADMIN_TOKEN = "admin-token-abc";
 const KEYCLOAK_USER_ID = "kc-user-123";
 
@@ -57,7 +57,7 @@ function mockSuccessfulKeycloakRegistration() {
     .mockResolvedValueOnce({ data: { id: "role-id", name: "client" } });
 }
 
-// ─── registerUser ────────────────────────────────────────────────────────────
+// registerUser
 describe("registerUser", () => {
   beforeEach(() => jest.clearAllMocks());
 
@@ -169,7 +169,7 @@ describe("registerUser", () => {
     mockedAxios.post
       // getAdminToken ok
       .mockResolvedValueOnce({ data: { access_token: ADMIN_TOKEN } })
-      // crear usuario → keycloak devuelve 409
+      // crear usuario -> keycloak devuelve 409
       .mockRejectedValueOnce({ response: { status: 409 } });
 
     await expect(registerUser(registerInput)).rejects.toMatchObject({
@@ -178,7 +178,7 @@ describe("registerUser", () => {
   });
 });
 
-// ─── loginUser ───────────────────────────────────────────────────────────────
+// loginUser
 describe("loginUser", () => {
   beforeEach(() => jest.clearAllMocks());
 
