@@ -23,8 +23,8 @@ jobs:
           context: ./apps/api
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/api:latest
-            ghcr.io/${{ github.repository }}/api:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/api:latest
+            ghcr.io/${{ github.repository_owner }}/api:${{ github.sha }}
 
       - name: Build and push Search image
         uses: docker/build-push-action@v5
@@ -32,5 +32,5 @@ jobs:
           context: ./apps/search
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/search:latest
-            ghcr.io/${{ github.repository }}/search:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/search:latest
+            ghcr.io/${{ github.repository_owner }}/search:${{ github.sha }}
